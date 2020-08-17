@@ -1,7 +1,10 @@
-import utils.MapIO
+import data.map.MazeMap
+import utils.MapDescriptor
 
 fun main() {
     println("Hello World!")
-    val test = MapIO()
-    test.loadMapFromDisk("/BlankMap1.txt")
+    val test = MapDescriptor()
+    val mazeMap = MazeMap()
+    test.loadMapFromDisk(mazeMap, "/BlankMap.txt")
+    test.debugMap(mazeMap)
 }

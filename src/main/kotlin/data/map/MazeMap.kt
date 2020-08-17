@@ -1,6 +1,9 @@
 package data.map
 
-data class MazeMap(val rowSize: Int,val colSize: Int) {
+import constants.DEFAULT_COL_SIZE
+import constants.DEFAULT_ROW_SIZE
+
+data class MazeMap(val rowSize: Int = DEFAULT_ROW_SIZE,val colSize: Int = DEFAULT_COL_SIZE) {
     val grid: Array<Array<Cell?>> = Array(rowSize) { arrayOfNulls<Cell>(colSize) }
     init {
         for (row in 0 until rowSize) {
