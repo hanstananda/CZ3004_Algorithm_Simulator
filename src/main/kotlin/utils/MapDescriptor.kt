@@ -9,12 +9,7 @@ class MapDescriptor {
         MapDescriptor::class.java.getResourceAsStream(fileName).bufferedReader().useLines { it ->
             it.forEachIndexed  { row, line ->
                 for(col in 0 until DEFAULT_COL_SIZE) {
-                    if(line[col] == '1') {
-                        mazeMap.setIsObstacle(row, col, true);
-                    }
-                    else {
-                        mazeMap.setIsObstacle(row, col, false)
-                    }
+                    mazeMap.setObstacle(row, col, line[col] == '1')
                 }
             }
         }
@@ -24,9 +19,9 @@ class MapDescriptor {
         for (row in 0 until mazeMap.rowSize) {
             val builder = StringBuilder()
             for( col in 0 until mazeMap.colSize) {
-                builder.append(if(mazeMap.grid[row][col]!!.obstacle) "1" else "0")
+                builder.append(if(mazeMap.grid[row][col].obstacle) "1" else "0")
             }
-            println(builder.toString());
+            println(builder.toString())
         }
     }
 
