@@ -1,6 +1,6 @@
 import data.map.MazeMap
-import utils.MapDescriptor
-import utils.RandomMapGenerator
+import utils.map.MapDescriptor
+import utils.map.RandomMapGenerator
 
 fun main() {
     println("Hello World!")

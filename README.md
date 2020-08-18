@@ -13,11 +13,19 @@ Source codes will be located under `/src/main`.
 It will be separated by two main directories, `java` and `kotlin`, 
 which corresponds to the languages the classes are written. 
 
-This will be further divided with several directories: 
+This will be further divided with several packages: 
 *   `../data`  
     This directory consists of a data classes used in the project. 
 *   `../utils`  
     This directory consists of classes utilities which usage is shared among multiple classes in the project.
+*   `.../constants`
+    THis directory consists of constants to be used in the project.
+
+`data` and `utils` are further divided into several packages based on its functionality, namely: 
+*   `map`
+    Map-related classes
+*   `roobt`
+    Robot-related classes 
 
 More details will be updated. 
 

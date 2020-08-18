@@ -1,4 +1,4 @@
-package utils
+package utils.map
 
 import data.map.MazeMap
 import java.util.*

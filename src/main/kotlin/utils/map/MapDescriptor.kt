@@ -1,7 +1,6 @@
-package utils
+package utils.map
 
 import constants.DEFAULT_COL_SIZE
-import data.map.Cell
 import data.map.MazeMap
 
 class MapDescriptor {

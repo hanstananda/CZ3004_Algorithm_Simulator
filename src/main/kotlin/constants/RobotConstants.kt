@@ -9,24 +9,22 @@ enum class DIRECTION {
     // Note: The current implementation is tedious, yet is the most efficient. More discussion needed
     // Alternative: https://stackoverflow.com/questions/609860/convert-from-enum-ordinal-to-enum-type/609879
     NORTH {
-        override fun getNext(cur: DIRECTION): DIRECTION = EAST
-        override fun getPrev(cur: DIRECTION): DIRECTION = WEST
+        override fun print(cur: DIRECTION) = 'N'
     },
     SOUTH {
-        override fun getNext(cur: DIRECTION): DIRECTION = WEST
-        override fun getPrev(cur: DIRECTION): DIRECTION = EAST
+        override fun print(cur: DIRECTION) = 'S'
     },
     WEST {
-        override fun getNext(cur: DIRECTION): DIRECTION = NORTH
-        override fun getPrev(cur: DIRECTION): DIRECTION = SOUTH
+        override fun print(cur: DIRECTION) = 'W'
     },
     EAST {
-        override fun getNext(cur: DIRECTION): DIRECTION = SOUTH
-        override fun getPrev(cur: DIRECTION): DIRECTION = NORTH
+        override fun print(cur: DIRECTION) = 'E'
     };
 
-    abstract fun getNext(cur: DIRECTION): DIRECTION
-    abstract fun getPrev(cur: DIRECTION): DIRECTION
+    private val directionValues: Array<DIRECTION> = values()
+    abstract fun print(cur: DIRECTION): Char
+    fun getNext(cur: DIRECTION): DIRECTION = directionValues[(cur.ordinal + 1)% directionValues.size]
+    fun getPrev(cur: DIRECTION): DIRECTION = directionValues[(cur.ordinal + directionValues.size -1 )% directionValues.size]
 }
 
 enum class MOVEMENT {
