@@ -1,10 +1,15 @@
 import data.map.MazeMap
 import utils.MapDescriptor
+import utils.RandomMapGenerator
 
 fun main() {
     println("Hello World!")
-    val test = MapDescriptor()
-    val mazeMap = MazeMap()
-    test.loadMapFromDisk(mazeMap, "/BlankMap.txt")
-    test.debugMap(mazeMap)
+    val testMapDescriptor = MapDescriptor()
+    var mazeMap = MazeMap()
+//    testMapDescriptor.loadMapFromDisk(mazeMap, "/BlankMap.txt")
+//    testMapDescriptor.debugMap(mazeMap)
+    val testRandomMaze = RandomMapGenerator()
+    mazeMap = testRandomMaze.createValidatedRandomMazeMap()
+    testMapDescriptor.debugMap(mazeMap)
+
 }

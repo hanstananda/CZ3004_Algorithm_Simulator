@@ -23,10 +23,19 @@ data class MazeMap(val rowSize: Int = DEFAULT_ROW_SIZE, val colSize: Int = DEFAU
         }
     }
 
+    fun resetAllObstacle() {
+        for (row in 0 until rowSize) {
+            for (col in 0 until colSize) {
+                grid[row][col].obstacle = false;
+                grid[row][col].virtualWall = false;
+            }
+        }
+    }
+
     fun setAllUnexplored() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col]!!.explored = false;
+                grid[row][col].explored = false;
             }
         }
     }
@@ -34,23 +43,23 @@ data class MazeMap(val rowSize: Int = DEFAULT_ROW_SIZE, val colSize: Int = DEFAU
     fun setAllExplored() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col]!!.explored = true;
+                grid[row][col].explored = true;
             }
         }
     }
 
-    fun setObstacle(row: Int, col: Int, obstacle: Boolean) {
-        if (obstacle && (inStartZone(row, col) || inGoalZone(row, col))) {
+    fun setObstacle(row: Int, col: Int) {
+        if (inStartZone(row, col) || inGoalZone(row, col)) {
             return
         }
-        grid[row][col]!!.obstacle = obstacle
+        grid[row][col].obstacle = true
         for(x in xMove) {
             for (y in yMove) {
                 val rowT = row + y
                 val colT = col + x
                 if(checkValidCoordinates(rowT, colT)) {
                     //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
-                    grid[rowT][colT].virtualWall = obstacle;
+                    grid[rowT][colT].virtualWall = true;
                 }
             }
         }
