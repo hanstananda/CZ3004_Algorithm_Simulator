@@ -9,17 +9,20 @@ data class Robot(var row: Int, var col: Int) {
     var delay: Int = constants.DELAY
 
     // TODO: Finalize sensor placements and add ultrasonic sensors
-    val sensors: Array<Sensor> = arrayOf(
+    private val sensors: Array<Sensor> = arrayOf(
+        // IR Short Range Front
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
         row+1, col-1, robotDir, "IRS_FL"),
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
             row+1, col, robotDir, "IRS_FM"),
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
             row+1, col+1, robotDir, "IRS_FR"),
+        // IR Short Range LR
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
             row, col-1, findNewDirection(MOVEMENT.LEFT), "IRS_L"),
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
             row, col+1, findNewDirection(MOVEMENT.RIGHT), "IRS_R"),
+        // IR Long Range L
         Sensor(SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
             row-1, col+1, findNewDirection(MOVEMENT.LEFT), "IRL_L")
         )
