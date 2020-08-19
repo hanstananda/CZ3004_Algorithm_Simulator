@@ -73,6 +73,14 @@ data class MazeMap(val rowSize: Int = DEFAULT_ROW_SIZE, val colSize: Int = DEFAU
     }
 
     /**
+     * Returns true if the row and column values are valid.
+     * Note: Pair is in form of (col, row) or (x,y)
+     */
+    fun checkValidCoordinates(coord: Pair<Int, Int>): Boolean {
+        return checkValidCoordinates(coord.second, coord.first)
+    }
+
+    /**
      * Returns true if the row and column values are in the start zone.
      */
     private fun inStartZone(row: Int, col: Int): Boolean {

@@ -33,6 +33,25 @@ More details will be updated.
 
 To be updated
 
+## Current assumptions for coding: 
+Hardly reconfigurable: 
+*   Robot fills 3x3 cells, with the center is used as a reference
+*   Arena map uses 0-based indexing
+*   `row` is defined as the long side of the maze (20 blocks)
+*   `col` is defined as the short side of the maze (15 blocks)
+*   Virtual walls are 1 block in size
+*   There are 4 directions, namely North, South, East and West with operations as follows: 
+    -   North: row+1
+    -   South: row-1
+    -   East: col+1
+    -   West: col-1
+
+Easily reconfigurable: 
+*   Arena size is 15 by 20
+*   Robot starts from North direction
+
+More details will be updated asap. 
+
 ## Additional notes 
 
 It is recommended to use [IntelliJ IDEA](https://www.jetbrains.com/idea/) as the IDE to 

@@ -46,7 +46,7 @@ class RandomMapGenerator {
             val curPos = bfs.remove()
             for(i in 0..3) {
                 val nextPos = Pair(curPos.first+ xMove[i], curPos.second + yMove[i])
-                if (!(mazeMap.checkValidCoordinates(nextPos.second, nextPos.first))) {
+                if (!(mazeMap.checkValidCoordinates(nextPos))) {
                     continue
                 }
                 else if(visited[nextPos.second][nextPos.first] || mazeMap.grid[nextPos.second][nextPos.first].obstacle) {
