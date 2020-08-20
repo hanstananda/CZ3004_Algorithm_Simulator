@@ -23,7 +23,7 @@ class RobotRunTests {
     @Nested
     @DisplayName("Movement tests for robot simulation")
     inner class MovementTests {
-        val robot = Robot(START_ROW, START_COL)
+        private val robot = Robot(START_ROW, START_COL)
 
         @BeforeEach
         fun `Initialize robot`() {
@@ -62,6 +62,29 @@ class RobotRunTests {
             Assertions.assertEquals(START_ROW, robot.row)
             Assertions.assertEquals(START_COL, robot.col)
         }
+
+        @Test
+        fun `check forward left move loop back to position`() {
+            for(i in 1..4) {
+                robot.move(MOVEMENT.FORWARD)
+                robot.move(MOVEMENT.LEFT)
+            }
+            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(START_ROW , robot.row)
+            Assertions.assertEquals(START_COL, robot.col)
+        }
+
+        @Test
+        fun `check right backward move loop back to position`() {
+            for(i in 1..4) {
+                robot.move(MOVEMENT.RIGHT)
+                robot.move(MOVEMENT.BACKWARD)
+            }
+            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(START_ROW , robot.row)
+            Assertions.assertEquals(START_COL, robot.col)
+        }
+
     }
 
     @Nested
