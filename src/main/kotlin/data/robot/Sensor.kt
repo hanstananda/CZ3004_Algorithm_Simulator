@@ -9,8 +9,8 @@ data class Sensor(
     var row: Int, var col: Int, var dir: DIRECTION, val id: String
 ) {
     private val logger = KotlinLogging.logger {}
-    private val xSee = intArrayOf(0,0,1,-1)
-    private val ySee = intArrayOf(1,-1,0,0)
+    private val xSee = intArrayOf(0,1,0,-1)
+    private val ySee = intArrayOf(1,0,-1,0)
 
     fun setSensor(row: Int, col: Int, dir: DIRECTION) {
         this.row = row

@@ -4,11 +4,8 @@ import constants.*
 import data.map.MazeMap
 import java.util.concurrent.TimeUnit
 
-data class Robot(var row: Int, var col: Int) {
-    var robotDir: DIRECTION = START_DIR
-    var delay: Int = constants.DELAY
-
-    /**
+data class Robot(var startRow: Int, var startCol: Int) {
+        /**
      * Represents the robot moving in the arena.
      *
      * The robot is represented by a 3 x 3 cell space as below:
@@ -21,10 +18,14 @@ data class Robot(var row: Int, var col: Int) {
      *
      * IRS = Infrared Short Range Sensor, IRL = Infrared Long Range Sensor
      *
-     * @author
+     * @author Hans Tananda
      */
 
-    // TODO: Finalize sensor placements and add ultrasonic sensors
+    var robotDir: DIRECTION = START_DIR
+    var delay: Int = constants.DELAY
+    var row: Int = startRow
+    var col: Int = startCol
+
     private val sensors: Array<Sensor> = arrayOf(
         // IR Short Range Front
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
@@ -98,6 +99,11 @@ data class Robot(var row: Int, var col: Int) {
         return res
     }
 
+    fun resetRobot() {
+        setRobotPos(startRow, startCol)
+        robotDir = START_DIR
+        delay = DELAY
+    }
 
     fun setRobotPos(row: Int, col: Int) {
         this.row = row
@@ -126,7 +132,7 @@ data class Robot(var row: Int, var col: Int) {
                 DIRECTION.WEST -> col++
             }
             MOVEMENT.LEFT, MOVEMENT.RIGHT -> {
-                findNewDirection(m)
+                robotDir = findNewDirection(m)
             }
         }
         updateSensorPos()

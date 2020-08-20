@@ -17,11 +17,11 @@ enum class DIRECTION {
     NORTH {
         override fun print(cur: DIRECTION) = 'N'
     },
-    SOUTH {
-        override fun print(cur: DIRECTION) = 'S'
-    },
     EAST {
         override fun print(cur: DIRECTION) = 'E'
+    },
+    SOUTH {
+        override fun print(cur: DIRECTION) = 'S'
     },
     WEST {
         override fun print(cur: DIRECTION) = 'W'
