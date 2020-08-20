@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test
 import utils.map.MapDescriptor
 
 class RobotRunTests {
-    val mapDescriptor: MapDescriptor = MapDescriptor()
-    val testMap: MazeMap = MazeMap()
-    val filename =  "TestMap1.txt"
+    private val mapDescriptor: MapDescriptor = MapDescriptor()
+    private val testMap: MazeMap = MazeMap()
+    private val filename =  "TestMap1.txt"
 
     @Test
     fun `check robot initialization success`() {
@@ -30,6 +30,11 @@ class RobotRunTests {
         Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
         Assertions.assertEquals(START_ROW+1, robot.row)
         Assertions.assertEquals(START_COL, robot.col)
+    }
+
+    @Test
+    fun `check sensor simulation in robot working`() {
+        TODO()
     }
 
     @BeforeEach

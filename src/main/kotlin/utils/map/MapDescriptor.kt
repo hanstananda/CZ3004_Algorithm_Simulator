@@ -23,6 +23,9 @@ class MapDescriptor {
                 if(mazeMap.grid[row][col].obstacle) {
                     builder.append("#")
                 }
+                else if (mazeMap.grid[row][col].explored){
+                    builder.append("*")
+                }
                 else if(mazeMap.grid[row][col].virtualWall) {
                     builder.append("|")
                 }
@@ -35,7 +38,7 @@ class MapDescriptor {
     }
 
     fun generateMapDescriptor(mazeMap: MazeMap) {
-
+        TODO()
     }
 
 

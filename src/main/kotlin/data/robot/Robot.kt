@@ -1,7 +1,7 @@
 package data.robot
 
 import constants.*
-import java.util.*
+import data.map.MazeMap
 import java.util.concurrent.TimeUnit
 
 data class Robot(var row: Int, var col: Int) {
@@ -72,6 +72,14 @@ data class Robot(var row: Int, var col: Int) {
 
             }
         }
+    }
+
+    fun simulateSensors(exploredMap: MazeMap, realMap: MazeMap):Array<Int> {
+        val res:Array<Int> = Array(sensors.size) {-1}
+        for (i in sensors.indices) {
+            res[i] = sensors[i].simulateSense(exploredMap, realMap)
+        }
+        return res
     }
 
 
