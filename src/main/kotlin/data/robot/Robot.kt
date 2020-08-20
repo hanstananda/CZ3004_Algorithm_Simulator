@@ -8,6 +8,22 @@ data class Robot(var row: Int, var col: Int) {
     var robotDir: DIRECTION = START_DIR
     var delay: Int = constants.DELAY
 
+    /**
+     * Represents the robot moving in the arena.
+     *
+     * The robot is represented by a 3 x 3 cell space as below:
+     *
+     *         ^   ^   ^
+     *        IRS IRS IRS
+     *   <IRL [X] [X] [X] IRS >
+     *        [X] [X] [X]
+     *        [X] [X] [X] IRS >
+     *
+     * IRS = Infrared Short Range Sensor, IRL = Infrared Long Range Sensor
+     *
+     * @author
+     */
+
     // TODO: Finalize sensor placements and add ultrasonic sensors
     private val sensors: Array<Sensor> = arrayOf(
         // IR Short Range Front
@@ -17,14 +33,14 @@ data class Robot(var row: Int, var col: Int) {
             row+1, col, robotDir, "IRS_FM"),
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
             row+1, col+1, robotDir, "IRS_FR"),
-        // IR Short Range LR
+        // IR Short Range R
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row, col-1, findNewDirection(MOVEMENT.LEFT), "IRS_L"),
+            row+1, col+1, findNewDirection(MOVEMENT.LEFT), "IRS_RF"),
         Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row, col+1, findNewDirection(MOVEMENT.RIGHT), "IRS_R"),
+            row-1, col+1, findNewDirection(MOVEMENT.RIGHT), "IRS_RB"),
         // IR Long Range L
         Sensor(SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
-            row-1, col+1, findNewDirection(MOVEMENT.LEFT), "IRL_L")
+            row+1, col-1, findNewDirection(MOVEMENT.LEFT), "IRL_LF")
         )
 
     private fun updateSensorPos() {
@@ -34,30 +50,30 @@ data class Robot(var row: Int, var col: Int) {
                 sensors[1].setSensor(row+1, col, robotDir)
                 sensors[2].setSensor(row+1, col+1, robotDir)
 
-                sensors[3].setSensor(row, col-1,  findNewDirection(MOVEMENT.LEFT))
-                sensors[4].setSensor(row, col+1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row+1, col+1,  findNewDirection(MOVEMENT.LEFT))
+                sensors[4].setSensor(row-1, col+1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row-1, col+1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row+1, col-1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.SOUTH -> {
                 sensors[0].setSensor(row-1, col+1, robotDir)
                 sensors[1].setSensor(row-1, col, robotDir)
                 sensors[2].setSensor(row-1, col-1, robotDir)
 
-                sensors[3].setSensor(row, col+1,  findNewDirection(MOVEMENT.LEFT))
-                sensors[4].setSensor(row, col-1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row-1, col-1,  findNewDirection(MOVEMENT.LEFT))
+                sensors[4].setSensor(row+1, col-1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row+1, col-1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row-1, col+1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.EAST -> {
                 sensors[0].setSensor(row-1, col+1, robotDir)
                 sensors[1].setSensor(row, col+1, robotDir)
                 sensors[2].setSensor(row+1, col+1, robotDir)
 
-                sensors[3].setSensor(row+1, col,  findNewDirection(MOVEMENT.LEFT))
-                sensors[4].setSensor(row-1, col, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row-1, col+1,  findNewDirection(MOVEMENT.LEFT))
+                sensors[4].setSensor(row-1, col-1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row-1, col+1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row+1, col+1, findNewDirection(MOVEMENT.LEFT))
 
             }
             DIRECTION.WEST -> {
@@ -65,10 +81,10 @@ data class Robot(var row: Int, var col: Int) {
                 sensors[1].setSensor(row, col-1, robotDir)
                 sensors[2].setSensor(row+1, col-1, robotDir)
 
-                sensors[3].setSensor(row-1, col,  findNewDirection(MOVEMENT.LEFT))
-                sensors[4].setSensor(row+1, col, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row+1, col-1,  findNewDirection(MOVEMENT.LEFT))
+                sensors[4].setSensor(row+1, col+1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row+1, col-1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row-1, col-1, findNewDirection(MOVEMENT.LEFT))
 
             }
         }
@@ -113,6 +129,7 @@ data class Robot(var row: Int, var col: Int) {
                 findNewDirection(m)
             }
         }
+        updateSensorPos()
     }
 
     private fun findNewDirection(m: MOVEMENT): DIRECTION {

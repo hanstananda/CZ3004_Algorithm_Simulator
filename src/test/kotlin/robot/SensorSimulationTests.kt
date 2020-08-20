@@ -25,7 +25,7 @@ class SensorSimulationTests {
 
     @Test
     fun `check sensor simulate sensing obstacle NORTH direction`() {
-        var exploredMap = MazeMap()
+        val exploredMap = MazeMap()
         val sensor = Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H, 0,0, DIRECTION.NORTH, "IRS_TEST")
         // Current target obstacle from test map is at 2,7
         val obstacleRow = 2
@@ -38,7 +38,7 @@ class SensorSimulationTests {
         Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].explored)
         Assertions.assertFalse(exploredMap.grid[obstacleRow+1][obstacleCol].explored)
 
-        exploredMap = MazeMap()
+        exploredMap.reset()
         sensor.setSensor(obstacleRow-2,obstacleCol, DIRECTION.NORTH)
         val res2 = sensor.simulateSense(exploredMap, testMap)
         Assertions.assertEquals(2, res2)
@@ -50,7 +50,7 @@ class SensorSimulationTests {
 
     @Test
     fun `check sensor simulate sensing obstacle SOUTH direction`() {
-        var exploredMap = MazeMap()
+        val exploredMap = MazeMap()
         val sensor = Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H, 0,0, DIRECTION.SOUTH, "IRS_TEST")
         val obstacleRow = 2
         val obstacleCol = 7
@@ -62,7 +62,7 @@ class SensorSimulationTests {
         Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].explored)
         Assertions.assertFalse(exploredMap.grid[obstacleRow-1][obstacleCol].explored)
 
-        exploredMap = MazeMap()
+        exploredMap.reset()
         sensor.setSensor(obstacleRow+2,obstacleCol, DIRECTION.SOUTH)
         val res2 = sensor.simulateSense(exploredMap, testMap)
         Assertions.assertEquals(2, res2)
@@ -74,7 +74,7 @@ class SensorSimulationTests {
 
     @Test
     fun `check sensor simulate sensing obstacle WEST direction`() {
-        var exploredMap = MazeMap()
+        val exploredMap = MazeMap()
         val sensor = Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H, 0,0, DIRECTION.WEST, "IRS_TEST")
         val obstacleRow = 2
         val obstacleCol = 7
@@ -86,7 +86,7 @@ class SensorSimulationTests {
         Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].explored)
         Assertions.assertFalse(exploredMap.grid[obstacleRow][obstacleCol-1].explored)
 
-        exploredMap = MazeMap()
+        exploredMap.reset()
         sensor.setSensor(obstacleRow,obstacleCol+2, DIRECTION.WEST)
         val res2 = sensor.simulateSense(exploredMap, testMap)
         Assertions.assertEquals(2, res2)
@@ -97,7 +97,7 @@ class SensorSimulationTests {
 
     @Test
     fun `check sensor simulate sensing obstacle EAST direction`() {
-        var exploredMap = MazeMap()
+        val exploredMap = MazeMap()
         val sensor = Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H, 0,0, DIRECTION.EAST, "IRS_TEST")
         val obstacleRow = 2
         val obstacleCol = 7
@@ -109,7 +109,7 @@ class SensorSimulationTests {
         Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].explored)
         Assertions.assertFalse(exploredMap.grid[obstacleRow][obstacleCol+1].explored)
 
-        exploredMap = MazeMap()
+        exploredMap.reset()
         sensor.setSensor(obstacleRow,obstacleCol-2, DIRECTION.EAST)
         val res2 = sensor.simulateSense(exploredMap, testMap)
         Assertions.assertEquals(2, res2)

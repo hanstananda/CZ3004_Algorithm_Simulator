@@ -7,7 +7,7 @@ const val START_COL = 1
 const val SENSOR_SHORT_RANGE_L = 1 // range of short range sensor (cells)
 const val SENSOR_SHORT_RANGE_H = 2 // range of short range sensor (cells)
 const val SENSOR_LONG_RANGE_L = 3 // range of long range sensor (cells)
-const val SENSOR_LONG_RANGE_H = 4
+const val SENSOR_LONG_RANGE_H = 5
 val START_DIR = DIRECTION.NORTH
 const val DELAY = 100
 

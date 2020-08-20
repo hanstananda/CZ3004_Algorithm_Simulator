@@ -23,6 +23,11 @@ data class MazeMap(val rowSize: Int = DEFAULT_ROW_SIZE, val colSize: Int = DEFAU
         }
     }
 
+    fun reset() {
+        resetAllObstacle()
+        setAllExplored()
+    }
+
     fun resetAllObstacle() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {

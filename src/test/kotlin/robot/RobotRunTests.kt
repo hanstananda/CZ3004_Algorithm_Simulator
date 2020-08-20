@@ -33,8 +33,26 @@ class RobotRunTests {
     }
 
     @Test
-    fun `check sensor simulation in robot working`() {
-        TODO()
+    fun `check front sensor simulation in robot working`() {
+        val robot = Robot(START_ROW, START_COL)
+        val obstacleRow = 8
+        val obstacleColFr = 5
+        val obstacleColTo = 7
+        val exploredMap = MazeMap()
+
+        robot.setRobotPos(obstacleRow-2, obstacleColFr)
+        val ans1 = robot.simulateSensors(exploredMap, testMap)
+        Assertions.assertEquals(-1, ans1[0])
+        Assertions.assertEquals(1, ans1[1])
+        Assertions.assertEquals(1, ans1[2])
+
+        robot.move(MOVEMENT.RIGHT)
+        robot.move(MOVEMENT.FORWARD)
+        robot.move(MOVEMENT.LEFT)
+
+        val ans2 = robot.simulateSensors(exploredMap, testMap)
+
+        ans2.forEach { print(it); print(" ") }
     }
 
     @BeforeEach
