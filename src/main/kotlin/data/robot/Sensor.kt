@@ -23,7 +23,7 @@ data class Sensor(
      * -1 if no obstacle is detected.
      */
     fun simulateSense(exploredMap: MazeMap, realMap: MazeMap): Int {
-        logger.info{ "%s %d %d".format(dir.print(), ySee[dir.ordinal], xSee[dir.ordinal])}
+        logger.debug{ "%s %d %d".format(dir.print(), ySee[dir.ordinal], xSee[dir.ordinal])}
         for(i in 1 until lowerRange) {
             val rPos = this.row + ySee[dir.ordinal]*i
             val cPos = this.col + xSee[dir.ordinal]*i

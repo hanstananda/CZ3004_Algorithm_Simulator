@@ -6,6 +6,7 @@ import constants.START_COL
 import constants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
+import mu.KotlinLogging
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.function.Executable
 import utils.map.MapDescriptor
@@ -14,6 +15,7 @@ class RobotRunTests {
     private val mapDescriptor: MapDescriptor = MapDescriptor()
     private val testMap: MazeMap = MazeMap()
     private val filename = "TestMap1.txt"
+    private val logger = KotlinLogging.logger {}
 
     @Test
     fun `check robot initialization success`() {
@@ -186,9 +188,17 @@ class RobotRunTests {
             robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.WEST)
 
             var ans = robot.simulateSensors(exploredMap, testMap)
-            ans.forEach { print("%d ".format(it)) }
-            println("")
-            mapDescriptor.debugMap(exploredMap, robot)
+            if (logger.isDebugEnabled) {
+                ans.forEach { print("%d ".format(it)) }
+                println("")
+                mapDescriptor.debugMap(exploredMap, robot)
+            }
+
+            Assertions.assertTrue(exploredMap.grid[robot.row][robot.col-3].obstacle)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col-2].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col-2].explored)
+
+            Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
         }
 
         @Test
@@ -197,10 +207,20 @@ class RobotRunTests {
             val obstacleCol = 5
             robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.EAST)
 
-            var ans = robot.simulateSensors(exploredMap, testMap)
-            ans.forEach { print("%d ".format(it)) }
-            println("")
-            mapDescriptor.debugMap(exploredMap, robot)
+            val ans = robot.simulateSensors(exploredMap, testMap)
+
+            if (logger.isDebugEnabled) {
+                ans.forEach { print("%d ".format(it)) }
+                println("")
+                mapDescriptor.debugMap(exploredMap, robot)
+            }
+
+            Assertions.assertTrue(exploredMap.grid[robot.row-2][robot.col+1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-3][robot.col+1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-2][robot.col-1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-3][robot.col-1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row][robot.col+2].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row][robot.col+3].explored)
         }
 
         @Test
@@ -208,10 +228,24 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
             robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.NORTH)
-            var ans = robot.simulateSensors(exploredMap, testMap)
-            ans.forEach { print("%d ".format(it)) }
-            println("")
-            mapDescriptor.debugMap(exploredMap, robot)
+            val ans = robot.simulateSensors(exploredMap, testMap)
+
+            if (logger.isDebugEnabled) {
+                ans.forEach { print("%d ".format(it)) }
+                println("")
+                mapDescriptor.debugMap(exploredMap, robot)
+            }
+
+            Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
+            Assertions.assertTrue(exploredMap.grid[robot.row+2][robot.col].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row+3][robot.col].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row+2][robot.col+1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col-4].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col+2].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col+3].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+2].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+3].explored)
+
         }
 
         @Test
@@ -219,10 +253,21 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
             robot.setRobotPosAndDir(obstacleRow + 3, obstacleCol, DIRECTION.SOUTH)
-            var ans = robot.simulateSensors(exploredMap, testMap)
-            ans.forEach { print("%d ".format(it)) }
-            println("")
-            mapDescriptor.debugMap(exploredMap, robot)
+            val ans = robot.simulateSensors(exploredMap, testMap)
+
+            if (logger.isDebugEnabled) {
+                ans.forEach { print("%d ".format(it)) }
+                println("")
+                mapDescriptor.debugMap(exploredMap, robot)
+            }
+
+            Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
+            Assertions.assertTrue(exploredMap.grid[robot.row-2][robot.col-1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-3][robot.col-1].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+4].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+5].obstacle)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col-2].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col-2].explored)
         }
     }
 
