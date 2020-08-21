@@ -26,8 +26,9 @@ class RobotRunTests {
         private val robot = Robot(START_ROW, START_COL)
 
         @BeforeEach
-        fun `Initialize robot`() {
+        fun `Reset robot`() {
             robot.resetRobot()
+            robot.delay = 0
         }
 
         @Test
@@ -40,7 +41,7 @@ class RobotRunTests {
 
         @Test
         fun `check move backward working`() {
-            robot.setRobotPos(START_ROW + 1, START_COL)
+            robot.setRobotPosAndDir(START_ROW + 1, START_COL, DIRECTION.NORTH)
             robot.move(MOVEMENT.BACKWARD)
             Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
             Assertions.assertEquals(START_ROW, robot.row)
@@ -96,6 +97,7 @@ class RobotRunTests {
         @BeforeEach
         fun `Initialize robot`() {
             robot.resetRobot()
+            robot.delay = 0
             exploredMap.reset()
         }
 
@@ -105,7 +107,7 @@ class RobotRunTests {
             val obstacleColFr = 5
             val obstacleColTo = 7
 
-            robot.setRobotPos(obstacleRow - 2, obstacleColFr)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleColFr, DIRECTION.NORTH)
             val ans1 = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans1[0])
             Assertions.assertEquals(1, ans1[1])
@@ -130,7 +132,7 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
 
-            robot.setRobotPos(obstacleRow - 2, obstacleCol)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, DIRECTION.NORTH)
             var ans = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans[0])
             Assertions.assertEquals(1, ans[1])
@@ -155,7 +157,7 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
 
-            robot.setRobotPos(obstacleRow - 2, obstacleCol)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, DIRECTION.NORTH)
             var ans = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans[0])
             Assertions.assertEquals(1, ans[1])
@@ -175,6 +177,52 @@ class RobotRunTests {
             Assertions.assertEquals(1, ans[1])
             Assertions.assertEquals(1, ans[2])
 
+        }
+
+        @Test
+        fun `sensing and map exploration check WEST DIRECTION`() {
+            val obstacleRow = 8
+            val obstacleCol = 5
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.WEST)
+
+            var ans = robot.simulateSensors(exploredMap, testMap)
+            ans.forEach { print("%d ".format(it)) }
+            println("")
+            mapDescriptor.debugMap(exploredMap, robot)
+        }
+
+        @Test
+        fun `sensing and map exploration check EAST DIRECTION`() {
+            val obstacleRow = 8
+            val obstacleCol = 5
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.EAST)
+
+            var ans = robot.simulateSensors(exploredMap, testMap)
+            ans.forEach { print("%d ".format(it)) }
+            println("")
+            mapDescriptor.debugMap(exploredMap, robot)
+        }
+
+        @Test
+        fun `sensing and map exploration check NORTH direction`() {
+            val obstacleRow = 8
+            val obstacleCol = 5
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.NORTH)
+            var ans = robot.simulateSensors(exploredMap, testMap)
+            ans.forEach { print("%d ".format(it)) }
+            println("")
+            mapDescriptor.debugMap(exploredMap, robot)
+        }
+
+        @Test
+        fun `sensing and map exploration check SOUTH direction`() {
+            val obstacleRow = 8
+            val obstacleCol = 5
+            robot.setRobotPosAndDir(obstacleRow + 3, obstacleCol, DIRECTION.SOUTH)
+            var ans = robot.simulateSensors(exploredMap, testMap)
+            ans.forEach { print("%d ".format(it)) }
+            println("")
+            mapDescriptor.debugMap(exploredMap, robot)
         }
     }
 

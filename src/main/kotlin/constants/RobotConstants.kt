@@ -15,19 +15,19 @@ enum class DIRECTION {
     // Note: The current implementation is tedious, yet is the most efficient. More discussion needed
     // Alternative: https://stackoverflow.com/questions/609860/convert-from-enum-ordinal-to-enum-type/609879
     NORTH {
-        override fun print(cur: DIRECTION) = 'N'
+        override fun print() = 'N'
     },
     EAST {
-        override fun print(cur: DIRECTION) = 'E'
+        override fun print() = 'E'
     },
     SOUTH {
-        override fun print(cur: DIRECTION) = 'S'
+        override fun print() = 'S'
     },
     WEST {
-        override fun print(cur: DIRECTION) = 'W'
+        override fun print() = 'W'
     };
 
-    abstract fun print(cur: DIRECTION): Char
+    abstract fun print(): Char
     companion object {
         private val directionValues: Array<DIRECTION> = values()
         fun getNext(cur: DIRECTION): DIRECTION = directionValues[(cur.ordinal + 1) % directionValues.size]
