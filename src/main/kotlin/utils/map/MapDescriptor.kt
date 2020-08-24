@@ -1,6 +1,7 @@
 package utils.map
 
 import constants.DEFAULT_COL_SIZE
+import constants.DEFAULT_ROW_SIZE
 import constants.DIRECTION
 import data.map.MazeMap
 import data.robot.Robot
@@ -62,8 +63,49 @@ class MapDescriptor {
         }
     }
 
-    fun generateMapDescriptor(mazeMap: MazeMap) {
-        TODO()
+    private fun binToHex(bin: String): String {
+        val dec = bin.toInt(2)
+        return Integer.toHexString(dec)
+    }
+
+    fun generateMapDescriptor(mazeMap: MazeMap): Array<String> {
+        val ret = Array(2) {""}
+
+        val Part1 = StringBuilder()
+        val Part1_bin = StringBuilder()
+        Part1_bin.append("11")
+        for (r in 0 until DEFAULT_ROW_SIZE) {
+            for (c in 0 until DEFAULT_COL_SIZE) {
+                if (mazeMap.grid[r][c].explored) Part1_bin.append("1") else Part1_bin.append("0")
+                if (Part1_bin.length == 4) {
+                    Part1.append(binToHex(Part1_bin.toString()))
+                    Part1_bin.setLength(0)
+                }
+            }
+        }
+        Part1_bin.append("11")
+        Part1.append(binToHex(Part1_bin.toString()))
+        println("P1: $Part1")
+        ret[0] = Part1.toString()
+
+        val Part2 = StringBuilder()
+        val Part2_bin = StringBuilder()
+        for (r in 0 until DEFAULT_ROW_SIZE) {
+            for (c in 0 until DEFAULT_COL_SIZE) {
+                if (mazeMap.grid[r][c].explored) {
+                    if (mazeMap.grid[r][c].obstacle) Part2_bin.append("1") else Part2_bin.append("0")
+                    if (Part2_bin.length == 4) {
+                        Part2.append(binToHex(Part2_bin.toString()))
+                        Part2_bin.setLength(0)
+                    }
+                }
+            }
+        }
+        if (Part2_bin.isNotEmpty()) Part2.append(binToHex(Part2_bin.toString()))
+        println("P2: $Part2")
+        ret[1] = Part2.toString()
+
+        return ret
     }
 
 
