@@ -1,5 +1,6 @@
 package data.robot
 
+import com.google.gson.JsonObject
 import constants.DIRECTION
 import data.map.MazeMap
 import mu.KotlinLogging
@@ -11,11 +12,20 @@ data class Sensor(
     private val logger = KotlinLogging.logger {}
     private val xSee = intArrayOf(0,1,0,-1)
     private val ySee = intArrayOf(1,0,-1,0)
+    private var lastReading = -1
 
     fun setSensor(row: Int, col: Int, dir: DIRECTION) {
         this.row = row
         this.col = col
         this.dir = dir
+    }
+
+    fun getJson():JsonObject {
+        val json = JsonObject()
+        json.addProperty("update", "sensor_read")
+        json.addProperty("value", lastReading)
+        json.addProperty("id", id)
+        return json
     }
 
     /**
@@ -28,9 +38,11 @@ data class Sensor(
             val rPos = this.row + ySee[dir.ordinal]*i
             val cPos = this.col + xSee[dir.ordinal]*i
             if(!realMap.checkValidCoordinates(rPos, cPos)) {
+                lastReading = i
                 return i
             }
             if(realMap.grid[rPos][cPos].obstacle) {
+                lastReading = i
                 return i
             }
         }
@@ -39,15 +51,18 @@ data class Sensor(
             val rPos = this.row + ySee[dir.ordinal]*i
             val cPos = this.col + xSee[dir.ordinal]*i
             if(!realMap.checkValidCoordinates(rPos, cPos)) {
+                lastReading = i
                 return i
             }
             exploredMap.grid[rPos][cPos].explored = true
 
             if(realMap.grid[rPos][cPos].obstacle) {
                 exploredMap.setObstacle(rPos, cPos)
+                lastReading = i
                 return i
             }
         }
+        lastReading = -1
         return -1
     }
 }
