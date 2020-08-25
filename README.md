@@ -7,6 +7,7 @@ This project aims to simulate the robot algorithm
 This project uses [Gradle](https://gradle.org/install/) to link and build the Java Application 
 (Tested with gradle 6).   
 The project is compatible with [Java JDK or JRE](https://www.oracle.com/java/technologies/javase-downloads.html) version 8 or higher. 
+The project uses [Kotlin](https://kotlinlang.org/) version [1.4.0](https://github.com/JetBrains/kotlin/releases/tag/v1.4.0)
 
 ## Folder structure 
 Source codes will be located under `/src/main`. 
@@ -29,9 +30,32 @@ This will be further divided with several packages:
 
 More details will be updated. 
 
-## Running the App 
+## Building and Running the App 
 
-To be updated
+The project is set up to include a wrapper script, therefore one can just run `./gradlew <command>`, 
+where command can be any commands listed on `./gradlew tasks`
+
+Note: Windows user may run `gradlew <command>` or `gradlew.bat <command>` instead
+
+1.  The following command can be used to build the project
+
+    ```bash
+    ./gradlew build
+    ```
+    
+
+2.  To run the test cases, run: 
+    
+    ```bash 
+    ./gradlew test
+    ```
+
+Tutorial on running gradle app: https://guides.gradle.org/building-java-libraries/
+
+To run the app for development, for now just create a class with `main()` function in it, 
+then run the class using the built-in IntelliJ IDEA Runner. 
+
+More details will be updated later. 
 
 ## Current assumptions for coding: 
 Hardly reconfigurable: 
