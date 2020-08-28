@@ -1,15 +1,11 @@
 import data.map.MazeMap
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import utils.map.MapDescriptor
 import utils.map.RandomMapGenerator
 
-fun main() {
-    println("Hello World!")
-    val testMapDescriptor = MapDescriptor()
-    var mazeMap = MazeMap()
-//    testMapDescriptor.loadMapFromDisk(mazeMap, "/BlankMap.txt")
-//    testMapDescriptor.debugMap(mazeMap)
-    val testRandomMaze = RandomMapGenerator()
-    mazeMap = testRandomMaze.createValidatedRandomMazeMap()
-    testMapDescriptor.debugMap(mazeMap)
+// connect to ws://localhost:8080/ws
 
+fun main(args: Array<String>) {
+    embeddedServer(Netty, commandLineEnvironment(args)).start()
 }
