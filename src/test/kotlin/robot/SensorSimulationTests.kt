@@ -6,16 +6,15 @@ import data.robot.Sensor
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import utils.map.MapDescriptor
+import utils.map.loadMapFromDisk
 
 class SensorSimulationTests {
-    private val mapDescriptor: MapDescriptor = MapDescriptor()
     private val testMap: MazeMap = MazeMap()
     private val filename =  "TestMap1.txt"
 
     @BeforeEach
     fun initMap() {
-        mapDescriptor.loadMapFromDisk(testMap, "/$filename")
+        loadMapFromDisk(testMap, "/$filename")
     }
 
     @Test
