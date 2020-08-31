@@ -131,18 +131,16 @@ class SimulationApp {
             }
             // The command 'help' allows users to get a list of available commands.
             command.startsWith("/help") -> server.help(id)
-            else -> {
-
-            }
-
             // If no commands matched at this point, we notify about it.
-//            command.startsWith("/") -> server.sendTo(
-//                id,
-//                "server::help",
-//                "Unknown command ${command.takeWhile { !it.isWhitespace() }}"
-//            )
-            // Handle a normal message.
-//            else -> server.message(id, command)
+            command.startsWith("/") -> server.sendTo(
+                id,
+                "server::help",
+                "Unknown command ${command.takeWhile { !it.isWhitespace() }}"
+            )
+            else -> {
+                // Handle a normal message.
+                server.message(id, command)
+            }
         }
     }
 }

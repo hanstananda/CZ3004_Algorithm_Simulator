@@ -1,15 +1,31 @@
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import constants.*
+import data.map.MazeMap
+import data.robot.Robot
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import utils.map.RandomMapGenerator
+import utils.map.loadMapFromDisk
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
+
 class SimulatorServer {
     private val logger = KotlinLogging.logger {}
-    val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
+    private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
+    var mazeMap = MazeMap()
+    private val robot = Robot(START_ROW, START_COL)
+
+    init {
+        loadMapFromDisk(mazeMap, "/BlankMap.txt")
+    }
 
     suspend fun help(sender: String) {
-        logger.debug{ "Sending help message " }
+        logger.debug { "Sending help message " }
         members[sender]?.send(Frame.Text("[server::help] Possible commands are: /user, /help and /who"))
     }
 
@@ -53,6 +69,63 @@ class SimulatorServer {
         }
     }
 
+    suspend fun message(sender: String, message: String) {
+        val request: Map<String, String> =
+            Gson().fromJson(message, object : TypeToken<HashMap<String, String>>() {}.type)
+
+        // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
+        val commandType: String? = request[COMMAND]
+        var response = ""
+        when {
+            commandType == null -> {
+                response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
+            }
+            commandType.startsWith(MOVEMENT_COMMAND) -> {
+                val units = (request["units"]?: "1").toInt()
+                when(commandType) {
+                    FORWARD_COMMAND -> {
+                        for(unit in 1..units) {
+                            robot.move(MOVEMENT.FORWARD)
+                        }
+                    }
+                    BACKWARD_COMMAND -> {
+                        for(unit in 1..units) {
+                            robot.move(MOVEMENT.BACKWARD)
+                        }
+                    }
+                    else -> {
+                        response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
+                    }
+                }
+            }
+            commandType.startsWith(ROTATE_COMMAND) -> {
+                val angle = (request["angle"]?: "90").toInt()
+                when(commandType) {
+                    RIGHT_COMMAND -> {
+                        for(unit in 1..(angle / 90)) {
+                            robot.move(MOVEMENT.RIGHT)
+                        }
+                    }
+                    LEFT_COMMAND -> {
+                        for(unit in 1..(angle / 90)) {
+                            robot.move(MOVEMENT.LEFT)
+                        }
+                    }
+                    else -> {
+                        response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
+                    }
+                }
+            }
+            commandType.startsWith(IMAGE_COMMAND) -> {
+                response = Gson().toJson(UNSUPPORTED_COMMAND_ERROR)
+            }
+            else -> {
+                response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
+            }
+        }
+        members[sender]?.send(Frame.Text(response))
+    }
+
     /**
      * Sends a [message] to a list of [this] [WebSocketSession].
      */
@@ -68,5 +141,9 @@ class SimulatorServer {
                 }
             }
         }
+    }
+
+    suspend fun sendTo(recipient: String, sender: String, message: String) {
+        members[recipient]?.send(Frame.Text("[$sender] $message"))
     }
 }
