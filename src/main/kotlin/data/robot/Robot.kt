@@ -5,7 +5,7 @@ import data.map.MazeMap
 import java.util.concurrent.TimeUnit
 
 data class Robot(var startRow: Int, var startCol: Int) {
-        /**
+    /**
      * Represents the robot moving in the arena.
      *
      * The robot is represented by a 3 x 3 cell space as below:
@@ -17,6 +17,12 @@ data class Robot(var startRow: Int, var startCol: Int) {
      *        [X] [X] [X] IRS >
      *
      * IRS = Infrared Short Range Sensor, IRL = Infrared Long Range Sensor
+     * IRS_FL = front-facing IRS positioned on the left
+     * IRS_FM = front-facing IRS positioned on the middle
+     * IRS_FR = front-facing IRS positioned on the right
+     * IRS_RF = right-facing IRS positioned on the front
+     * IRS_RB = right-facing IRS positioned on the back
+     * IRL_LF = left-facing IRL positioned on the front
      *
      * @author Hans Tananda
      */
@@ -26,75 +32,87 @@ data class Robot(var startRow: Int, var startCol: Int) {
     var row: Int = startRow
     var col: Int = startCol
 
-    private val sensors: Array<Sensor> = arrayOf(
+    private val sensors:Map<String, Sensor> = mapOf(
         // IR Short Range Front
-        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-        row+1, col-1, robotDir, "IRS_FL"),
-        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row+1, col, robotDir, "IRS_FM"),
-        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row+1, col+1, robotDir, "IRS_FR"),
+        "IRS_FL" to Sensor(
+            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row + 1, col - 1, robotDir, "IRS_FL"
+        ),
+        "IRS_FM" to Sensor(
+            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row + 1, col, robotDir, "IRS_FM"
+        ),
+        "IRS_FR" to Sensor(
+            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row + 1, col + 1, robotDir, "IRS_FR"
+        ),
         // IR Short Range R
-        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row+1, col+1, findNewDirection(MOVEMENT.LEFT), "IRS_RF"),
-        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row-1, col+1, findNewDirection(MOVEMENT.RIGHT), "IRS_RB"),
+        "IRS_RF" to Sensor(
+            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row + 1, col + 1, findNewDirection(MOVEMENT.LEFT), "IRS_RF"
+        ),
+        "IRS_RB" to Sensor(
+            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT), "IRS_RB"
+        ),
         // IR Long Range L
-        Sensor(SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
-            row+1, col-1, findNewDirection(MOVEMENT.LEFT), "IRL_LF")
+        "IRL_LF" to Sensor(
+            SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
+            row + 1, col - 1, findNewDirection(MOVEMENT.LEFT), "IRL_LF"
         )
+    )
 
     private fun updateSensorPos() {
-        when(robotDir) {
+        when (robotDir) {
             DIRECTION.NORTH -> {
-                sensors[0].setSensor(row+1, col-1, robotDir)
-                sensors[1].setSensor(row+1, col, robotDir)
-                sensors[2].setSensor(row+1, col+1, robotDir)
+                sensors.getValue("IRS_FL").setSensor(row + 1, col - 1, robotDir)
+                sensors.getValue("IRS_FM").setSensor(row + 1, col, robotDir)
+                sensors.getValue("IRS_FR").setSensor(row + 1, col + 1, robotDir)
 
-                sensors[3].setSensor(row+1, col+1,  findNewDirection(MOVEMENT.RIGHT))
-                sensors[4].setSensor(row-1, col+1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row+1, col-1, findNewDirection(MOVEMENT.LEFT))
+                sensors.getValue("IRL_LF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.SOUTH -> {
-                sensors[0].setSensor(row-1, col+1, robotDir)
-                sensors[1].setSensor(row-1, col, robotDir)
-                sensors[2].setSensor(row-1, col-1, robotDir)
+                sensors.getValue("IRS_FL").setSensor(row - 1, col + 1, robotDir)
+                sensors.getValue("IRS_FM").setSensor(row - 1, col, robotDir)
+                sensors.getValue("IRS_FR").setSensor(row - 1, col - 1, robotDir)
 
-                sensors[3].setSensor(row-1, col-1,  findNewDirection(MOVEMENT.RIGHT))
-                sensors[4].setSensor(row+1, col-1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row-1, col+1, findNewDirection(MOVEMENT.LEFT))
+                sensors.getValue("IRL_LF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.EAST -> {
-                sensors[0].setSensor(row-1, col+1, robotDir)
-                sensors[1].setSensor(row, col+1, robotDir)
-                sensors[2].setSensor(row+1, col+1, robotDir)
+                sensors.getValue("IRS_FL").setSensor(row - 1, col + 1, robotDir)
+                sensors.getValue("IRS_FM").setSensor(row, col + 1, robotDir)
+                sensors.getValue("IRS_FR").setSensor(row + 1, col + 1, robotDir)
 
-                sensors[3].setSensor(row-1, col+1,  findNewDirection(MOVEMENT.RIGHT))
-                sensors[4].setSensor(row-1, col-1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row+1, col+1, findNewDirection(MOVEMENT.LEFT))
+                sensors.getValue("IRL_LF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.LEFT))
 
             }
             DIRECTION.WEST -> {
-                sensors[0].setSensor(row-1, col-1, robotDir)
-                sensors[1].setSensor(row, col-1, robotDir)
-                sensors[2].setSensor(row+1, col-1, robotDir)
+                sensors.getValue("IRS_FL").setSensor(row - 1, col - 1, robotDir)
+                sensors.getValue("IRS_FM").setSensor(row, col - 1, robotDir)
+                sensors.getValue("IRS_FR").setSensor(row + 1, col - 1, robotDir)
 
-                sensors[3].setSensor(row+1, col-1,  findNewDirection(MOVEMENT.RIGHT))
-                sensors[4].setSensor(row+1, col+1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors.getValue("IRS_RF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row-1, col-1, findNewDirection(MOVEMENT.LEFT))
+                sensors.getValue("IRL_LF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.LEFT))
 
             }
         }
     }
 
-    fun simulateSensors(exploredMap: MazeMap, realMap: MazeMap):Array<Int> {
-        val res:Array<Int> = Array(sensors.size) {-1}
-        for (i in sensors.indices) {
-            res[i] = sensors[i].simulateSense(exploredMap, realMap)
+    fun simulateSensors(exploredMap: MazeMap, realMap: MazeMap): Array<Int> {
+        val res: Array<Int> = Array(sensors.size) { -1 }
+        for (sensor in sensors) {
+            sensor.value.simulateSense(exploredMap, realMap)
         }
         return res
     }
@@ -124,14 +142,14 @@ data class Robot(var startRow: Int, var startCol: Int) {
         } catch (e: InterruptedException) {
             println("Something went wrong in Robot.move()!")
         }
-        when(m) {
-            MOVEMENT.FORWARD -> when(robotDir) {
+        when (m) {
+            MOVEMENT.FORWARD -> when (robotDir) {
                 DIRECTION.NORTH -> row++
                 DIRECTION.EAST -> col++
                 DIRECTION.SOUTH -> row--
                 DIRECTION.WEST -> col--
             }
-            MOVEMENT.BACKWARD -> when(robotDir) {
+            MOVEMENT.BACKWARD -> when (robotDir) {
                 DIRECTION.NORTH -> row--
                 DIRECTION.EAST -> col--
                 DIRECTION.SOUTH -> row++
