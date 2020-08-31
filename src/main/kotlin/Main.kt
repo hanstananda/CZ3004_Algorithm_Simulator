@@ -1,15 +1,19 @@
 import data.map.MazeMap
-import utils.map.MapDescriptor
+import mu.KotlinLogging
 import utils.map.RandomMapGenerator
+import utils.map.debugMap
+import utils.map.loadMapFromDisk
+
 
 fun main() {
-    println("Hello World!")
-    val testMapDescriptor = MapDescriptor()
+    val logger = KotlinLogging.logger {}
+    logger.info {"Test start main!"}
+//    val testMapDescriptor = MapDescriptor()
     var mazeMap = MazeMap()
-//    testMapDescriptor.loadMapFromDisk(mazeMap, "/BlankMap.txt")
-//    testMapDescriptor.debugMap(mazeMap)
+    loadMapFromDisk(mazeMap, "/TestMap1.txt")
+    debugMap(mazeMap)
     val testRandomMaze = RandomMapGenerator()
     mazeMap = testRandomMaze.createValidatedRandomMazeMap()
-    testMapDescriptor.debugMap(mazeMap)
+    debugMap(mazeMap)
 
 }
