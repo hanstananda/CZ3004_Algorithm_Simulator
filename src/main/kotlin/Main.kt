@@ -12,8 +12,7 @@ fun main() {
     var mazeMap = MazeMap()
     loadMapFromDisk(mazeMap, "/TestMap1.txt")
     debugMap(mazeMap)
-    val testRandomMaze = RandomMapGenerator()
-    mazeMap = testRandomMaze.createValidatedRandomMazeMap()
+    mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
     debugMap(mazeMap)
 
 }
