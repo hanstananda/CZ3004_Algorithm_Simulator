@@ -32,89 +32,83 @@ data class Robot(var startRow: Int, var startCol: Int) {
     var row: Int = startRow
     var col: Int = startCol
 
-    private val sensors:Map<String, Sensor> = mapOf(
+    private val sensors: Array<Sensor> = arrayOf(
         // IR Short Range Front
-        "IRS_FL" to Sensor(
-            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row + 1, col - 1, robotDir, "IRS_FL"
-        ),
-        "IRS_FM" to Sensor(
-            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row + 1, col, robotDir, "IRS_FM"
-        ),
-        "IRS_FR" to Sensor(
-            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row + 1, col + 1, robotDir, "IRS_FR"
-        ),
+        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row+1, col-1, robotDir, "IRS_FL"),
+        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row+1, col, robotDir, "IRS_FM"),
+        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row+1, col+1, robotDir, "IRS_FR"),
         // IR Short Range R
-        "IRS_RF" to Sensor(
-            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row + 1, col + 1, findNewDirection(MOVEMENT.LEFT), "IRS_RF"
-        ),
-        "IRS_RB" to Sensor(
-            SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
-            row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT), "IRS_RB"
-        ),
+        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row+1, col+1, findNewDirection(MOVEMENT.LEFT), "IRS_RF"),
+        Sensor(SENSOR_SHORT_RANGE_L, SENSOR_SHORT_RANGE_H,
+            row-1, col+1, findNewDirection(MOVEMENT.RIGHT), "IRS_RB"),
         // IR Long Range L
-        "IRL_LF" to Sensor(
-            SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
-            row + 1, col - 1, findNewDirection(MOVEMENT.LEFT), "IRL_LF"
-        )
+        Sensor(SENSOR_LONG_RANGE_L, SENSOR_LONG_RANGE_H,
+            row+1, col-1, findNewDirection(MOVEMENT.LEFT), "IRL_LF")
     )
 
+    private val sensorMap: Map<String, Sensor> = sensors.associateBy({it.id}, {it})
+
     private fun updateSensorPos() {
-        when (robotDir) {
+        when(robotDir) {
             DIRECTION.NORTH -> {
-                sensors.getValue("IRS_FL").setSensor(row + 1, col - 1, robotDir)
-                sensors.getValue("IRS_FM").setSensor(row + 1, col, robotDir)
-                sensors.getValue("IRS_FR").setSensor(row + 1, col + 1, robotDir)
+                sensors[0].setSensor(row+1, col-1, robotDir)
+                sensors[1].setSensor(row+1, col, robotDir)
+                sensors[2].setSensor(row+1, col+1, robotDir)
 
-                sensors.getValue("IRS_RF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
-                sensors.getValue("IRS_RF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row+1, col+1,  findNewDirection(MOVEMENT.RIGHT))
+                sensors[4].setSensor(row-1, col+1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors.getValue("IRL_LF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row+1, col-1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.SOUTH -> {
-                sensors.getValue("IRS_FL").setSensor(row - 1, col + 1, robotDir)
-                sensors.getValue("IRS_FM").setSensor(row - 1, col, robotDir)
-                sensors.getValue("IRS_FR").setSensor(row - 1, col - 1, robotDir)
+                sensors[0].setSensor(row-1, col+1, robotDir)
+                sensors[1].setSensor(row-1, col, robotDir)
+                sensors[2].setSensor(row-1, col-1, robotDir)
 
-                sensors.getValue("IRS_RF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
-                sensors.getValue("IRS_RF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row-1, col-1,  findNewDirection(MOVEMENT.RIGHT))
+                sensors[4].setSensor(row+1, col-1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors.getValue("IRL_LF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row-1, col+1, findNewDirection(MOVEMENT.LEFT))
             }
             DIRECTION.EAST -> {
-                sensors.getValue("IRS_FL").setSensor(row - 1, col + 1, robotDir)
-                sensors.getValue("IRS_FM").setSensor(row, col + 1, robotDir)
-                sensors.getValue("IRS_FR").setSensor(row + 1, col + 1, robotDir)
+                sensors[0].setSensor(row-1, col+1, robotDir)
+                sensors[1].setSensor(row, col+1, robotDir)
+                sensors[2].setSensor(row+1, col+1, robotDir)
 
-                sensors.getValue("IRS_RF").setSensor(row - 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
-                sensors.getValue("IRS_RF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row-1, col+1,  findNewDirection(MOVEMENT.RIGHT))
+                sensors[4].setSensor(row-1, col-1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors.getValue("IRL_LF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row+1, col+1, findNewDirection(MOVEMENT.LEFT))
 
             }
             DIRECTION.WEST -> {
-                sensors.getValue("IRS_FL").setSensor(row - 1, col - 1, robotDir)
-                sensors.getValue("IRS_FM").setSensor(row, col - 1, robotDir)
-                sensors.getValue("IRS_FR").setSensor(row + 1, col - 1, robotDir)
+                sensors[0].setSensor(row-1, col-1, robotDir)
+                sensors[1].setSensor(row, col-1, robotDir)
+                sensors[2].setSensor(row+1, col-1, robotDir)
 
-                sensors.getValue("IRS_RF").setSensor(row + 1, col - 1, findNewDirection(MOVEMENT.RIGHT))
-                sensors.getValue("IRS_RF").setSensor(row + 1, col + 1, findNewDirection(MOVEMENT.RIGHT))
+                sensors[3].setSensor(row+1, col-1,  findNewDirection(MOVEMENT.RIGHT))
+                sensors[4].setSensor(row+1, col+1, findNewDirection(MOVEMENT.RIGHT))
 
-                sensors.getValue("IRL_LF").setSensor(row - 1, col - 1, findNewDirection(MOVEMENT.LEFT))
+                sensors[5].setSensor(row-1, col-1, findNewDirection(MOVEMENT.LEFT))
 
             }
         }
     }
 
-    fun simulateSensors(exploredMap: MazeMap, realMap: MazeMap): Array<Int> {
-        val res: Array<Int> = Array(sensors.size) { -1 }
-        for (sensor in sensors) {
-            sensor.value.simulateSense(exploredMap, realMap)
+    fun simulateSensors(exploredMap: MazeMap, realMap: MazeMap):Array<Int> {
+        val res:Array<Int> = Array(sensors.size) {-1}
+        for (i in sensors.indices) {
+            res[i] = sensors[i].simulateSense(exploredMap, realMap)
         }
         return res
+    }
+
+    fun getSensorReadings(exploredMap: MazeMap, realMap: MazeMap): Map<String, Int> {
+        return sensors.associateBy({it.id},{it.simulateSense(exploredMap, realMap) } )
     }
 
     fun resetRobot() {

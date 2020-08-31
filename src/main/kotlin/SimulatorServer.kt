@@ -87,11 +87,13 @@ class SimulatorServer {
                         for(unit in 1..units) {
                             robot.move(MOVEMENT.FORWARD)
                         }
+                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
                     }
                     BACKWARD_COMMAND -> {
                         for(unit in 1..units) {
                             robot.move(MOVEMENT.BACKWARD)
                         }
+                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
                     }
                     else -> {
                         response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
@@ -105,11 +107,13 @@ class SimulatorServer {
                         for(unit in 1..(angle / 90)) {
                             robot.move(MOVEMENT.RIGHT)
                         }
+                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
                     }
                     LEFT_COMMAND -> {
                         for(unit in 1..(angle / 90)) {
                             robot.move(MOVEMENT.LEFT)
                         }
+                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
                     }
                     else -> {
                         response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
@@ -125,6 +129,7 @@ class SimulatorServer {
         }
         members[sender]?.send(Frame.Text(response))
     }
+
 
     /**
      * Sends a [message] to a list of [this] [WebSocketSession].
