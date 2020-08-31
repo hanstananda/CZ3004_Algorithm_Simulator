@@ -18,6 +18,7 @@ class SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
     var mazeMap = MazeMap()
+    var exploredMap = MazeMap()
     private val robot = Robot(START_ROW, START_COL)
 
     init {
@@ -81,19 +82,21 @@ class SimulatorServer {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
             }
             commandType.startsWith(MOVEMENT_COMMAND) -> {
-                val units = (request["units"]?: "1").toInt()
-                when(commandType) {
+                val units = (request["units"] ?: "1").toInt()
+                when (commandType) {
                     FORWARD_COMMAND -> {
-                        for(unit in 1..units) {
+                        for (unit in 1..units) {
                             robot.move(MOVEMENT.FORWARD)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        sendSensorTelemetry(sender)
                     }
                     BACKWARD_COMMAND -> {
-                        for(unit in 1..units) {
+                        for (unit in 1..units) {
                             robot.move(MOVEMENT.BACKWARD)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        sendSensorTelemetry(sender)
                     }
                     else -> {
                         response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
@@ -101,19 +104,21 @@ class SimulatorServer {
                 }
             }
             commandType.startsWith(ROTATE_COMMAND) -> {
-                val angle = (request["angle"]?: "90").toInt()
-                when(commandType) {
+                val angle = (request["angle"] ?: "90").toInt()
+                when (commandType) {
                     RIGHT_COMMAND -> {
-                        for(unit in 1..(angle / 90)) {
+                        for (unit in 1..(angle / 90)) {
                             robot.move(MOVEMENT.RIGHT)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        sendSensorTelemetry(sender)
                     }
                     LEFT_COMMAND -> {
-                        for(unit in 1..(angle / 90)) {
+                        for (unit in 1..(angle / 90)) {
                             robot.move(MOVEMENT.LEFT)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        sendSensorTelemetry(sender)
                     }
                     else -> {
                         response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
@@ -130,6 +135,20 @@ class SimulatorServer {
         members[sender]?.send(Frame.Text(response))
     }
 
+
+    private suspend fun sendSensorTelemetry(sender: String) {
+        val sensorReadings = robot.getSensorReadings(exploredMap, mazeMap)
+        for (result in sensorReadings) {
+            val response = Gson().toJson(
+                mapOf(
+                    "update" to "sensor_read",
+                    "id" to result.key,
+                    "value" to result.value
+                )
+            )
+            members[sender]?.send(Frame.Text(response))
+        }
+    }
 
     /**
      * Sends a [message] to a list of [this] [WebSocketSession].
