@@ -32,8 +32,9 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktorVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC" // JVM dependency
     implementation "io.github.microutils:kotlin-logging:1.8.3"
-    testImplementation "org.slf4j:slf4j-simple:1.7.30"
-    implementation  group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    implementation group: "ch.qos.logback", name: "logback-classic", version: "1.2.3"
+//    testImplementation "org.slf4j:slf4j-simple:1.7.30"
+//    implementation  group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation "org.junit.jupiter:junit-jupiter:$jUnitVersion"
 }
 
