@@ -1,7 +1,8 @@
 import data.map.MazeMap
 import mu.KotlinLogging
+
 import utils.map.*
-import utils.map.RandomMapGenerator
+
 
 fun main() {
     val logger = KotlinLogging.logger {}

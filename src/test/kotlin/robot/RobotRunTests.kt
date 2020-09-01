@@ -9,10 +9,10 @@ import data.robot.Robot
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.function.Executable
-import utils.map.MapDescriptor
+import utils.map.debugMap
+import utils.map.loadMapFromDisk
 
 class RobotRunTests {
-    private val mapDescriptor: MapDescriptor = MapDescriptor()
     private val testMap: MazeMap = MazeMap()
     private val filename = "TestMap1.txt"
     private val logger = KotlinLogging.logger {}
@@ -191,7 +191,7 @@ class RobotRunTests {
             if (logger.isDebugEnabled) {
                 ans.forEach { print("%d ".format(it)) }
                 println("")
-                mapDescriptor.debugMap(exploredMap, robot)
+                debugMap(exploredMap, robot)
             }
 
             Assertions.assertTrue(exploredMap.grid[robot.row][robot.col-3].obstacle)
@@ -212,7 +212,7 @@ class RobotRunTests {
             if (logger.isDebugEnabled) {
                 ans.forEach { print("%d ".format(it)) }
                 println("")
-                mapDescriptor.debugMap(exploredMap, robot)
+                debugMap(exploredMap, robot)
             }
 
             Assertions.assertTrue(exploredMap.grid[robot.row-2][robot.col+1].explored)
@@ -233,7 +233,7 @@ class RobotRunTests {
             if (logger.isDebugEnabled) {
                 ans.forEach { print("%d ".format(it)) }
                 println("")
-                mapDescriptor.debugMap(exploredMap, robot)
+                debugMap(exploredMap, robot)
             }
 
             Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
@@ -258,7 +258,7 @@ class RobotRunTests {
             if (logger.isDebugEnabled) {
                 ans.forEach { print("%d ".format(it)) }
                 println("")
-                mapDescriptor.debugMap(exploredMap, robot)
+                debugMap(exploredMap, robot)
             }
 
             Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
@@ -273,7 +273,7 @@ class RobotRunTests {
 
     @BeforeEach
     fun initMap() {
-        mapDescriptor.loadMapFromDisk(testMap, "/$filename")
+        loadMapFromDisk(testMap, "/$filename")
     }
 
 }

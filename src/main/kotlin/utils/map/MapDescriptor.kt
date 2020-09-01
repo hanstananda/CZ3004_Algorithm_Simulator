@@ -63,4 +63,6 @@ fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {
 
 fun generateMapDescriptor(mazeMap: MazeMap) {
     TODO()
+
 }
+
