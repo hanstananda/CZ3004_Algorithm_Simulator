@@ -19,7 +19,7 @@ fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
             mazeMap.setAllExplored()
 
         }
-    } catch (e: IOException) {
+    } catch (e: NullPointerException) {
         e.printStackTrace()
     }
 
