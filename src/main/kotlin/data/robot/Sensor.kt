@@ -1,18 +1,18 @@
 package data.robot
 
-import constants.DIRECTION
+import constants.RobotConstants
 import data.map.MazeMap
 import mu.KotlinLogging
 
 data class Sensor(
     val lowerRange: Int, val upperRange: Int,
-    var row: Int, var col: Int, var dir: DIRECTION, val id: String
+    var row: Int, var col: Int, var dir: RobotConstants.DIRECTION, val id: String
 ) {
     private val logger = KotlinLogging.logger {}
     private val xSee = intArrayOf(0,1,0,-1)
     private val ySee = intArrayOf(1,0,-1,0)
 
-    fun setSensor(row: Int, col: Int, dir: DIRECTION) {
+    fun setSensor(row: Int, col: Int, dir: RobotConstants.DIRECTION) {
         this.row = row
         this.col = col
         this.dir = dir

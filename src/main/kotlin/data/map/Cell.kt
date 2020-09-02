@@ -10,4 +10,13 @@ data class Cell(val row: Int, val col: Int) {
     var obstacle: Boolean = false
     var explored: Boolean = false
     var virtualWall: Boolean = false
+
+    fun getIsExplored(): Boolean {
+        return this.explored
+    }
+
+    fun getIsObstacle(): Boolean {
+        return this.obstacle
+    }
+
 }

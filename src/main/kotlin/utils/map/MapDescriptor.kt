@@ -1,21 +1,29 @@
 package utils.map
 
-import constants.DEFAULT_COL_SIZE
-import constants.DIRECTION
+import constants.RobotConstants
 import data.map.MazeMap
 import data.robot.Robot
+import java.io.IOException
 import kotlin.math.abs
 
 fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
-    object {}.javaClass.getResourceAsStream(fileName).bufferedReader().useLines { it ->
-        it.forEachIndexed  { row, line ->
-            for(col in 0 until DEFAULT_COL_SIZE) {
-                if(line[col] == '1') {
-                    mazeMap.setObstacle(mazeMap.rowSize-1-row, col)
+    try {
+        val fileName2 = "/".plus(fileName).plus(".txt")
+        object {}.javaClass.getResourceAsStream(fileName2).bufferedReader().useLines { it ->
+            it.forEachIndexed  { row, line ->
+                for(col in 0 until mazeMap.colSize) {
+                    if(line[col] == '1') {
+                        mazeMap.setObstacle(mazeMap.rowSize-1-row, col)
+                    }
                 }
             }
+            mazeMap.setAllExplored()
+
         }
+    } catch (e: IOException) {
+        e.printStackTrace()
     }
+
 }
 
 fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {
@@ -25,16 +33,16 @@ fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {
             if(robot != null && abs(robot.row - row) <=1 && abs(robot.col - col) <=1) {
                 if(robot.row==row && robot.col==col) {
                     when(robot.robotDir) {
-                        DIRECTION.NORTH -> {
+                        RobotConstants.DIRECTION.NORTH -> {
                             builder.append("^")
                         }
-                        DIRECTION.EAST -> {
+                        RobotConstants.DIRECTION.EAST -> {
                             builder.append(">")
                         }
-                        DIRECTION.SOUTH -> {
+                        RobotConstants.DIRECTION.SOUTH -> {
                             builder.append("V")
                         }
-                        DIRECTION.WEST -> {
+                        RobotConstants.DIRECTION.WEST -> {
                             builder.append("<")
                         }
                     }

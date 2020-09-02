@@ -7,7 +7,6 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-
 private var f: JFrame? = null
 private var m: JPanel? = null
 private var b: JPanel? = null
@@ -58,10 +57,10 @@ private fun displayMainFrame() {
 }
 
 private fun initMain() {
-//        if (!realRun) {
-//            m.add(realMap, "REAL_MAP");
-//        }
-//        m.add(exploredMap, "EXPLORATION");
+    if (!realRun) {
+        m?.add(realMap, "REAL_MAP");
+    }
+    m?.add(exploredMap, "EXPLORATION");
     val cl = m!!.layout as CardLayout
     if (!realRun) {
         cl.show(m, "REAL_MAP")
@@ -83,53 +82,53 @@ private fun formatButton(btn: JButton) {
 private fun addButtons() {
     if (!realRun) {
         // Load Map Button
-        val btn_LoadMap = JButton("Load Map")
-        formatButton(btn_LoadMap)
-        btn_LoadMap.addMouseListener(object : MouseAdapter() {
+        val loadMapButton = JButton("Load Map")
+        formatButton(loadMapButton)
+        loadMapButton.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 val loadMapDialog = JDialog(f, "Load Map", true)
-                loadMapDialog.setSize(400, 60)
+                loadMapDialog.setSize(400, 80)
                 loadMapDialog.layout = FlowLayout()
                 val loadTF = JTextField(15)
-                val loadMapButton = JButton("Load")
-                loadMapButton.addMouseListener(object : MouseAdapter() {
+                val loadButton = JButton("Load")
+                loadButton.addMouseListener(object : MouseAdapter() {
                     override fun mousePressed(e: MouseEvent) {
                         loadMapDialog.isVisible = false
                         loadMapFromDisk(realMap!!, loadTF.text)
                         val cl = m!!.layout as CardLayout
                         cl.show(m, "REAL_MAP")
-                        realMap!!.reset()
+                        realMap!!.repaint()
                     }
                 })
                 loadMapDialog.add(JLabel("File Name: "))
                 loadMapDialog.add(loadTF)
-                loadMapDialog.add(loadMapButton)
+                loadMapDialog.add(loadButton)
                 loadMapDialog.isVisible = true
             }
         })
-        b!!.add(btn_LoadMap)
+        b!!.add(loadMapButton)
     }
 
 
     // Exploration Button
-    val btn_Exploration = JButton("Exploration")
-    formatButton(btn_Exploration)
-    btn_Exploration.addMouseListener(object : MouseAdapter() {
+    val exploreButton = JButton("Exploration")
+    formatButton(exploreButton)
+    exploreButton.addMouseListener(object : MouseAdapter() {
         override fun mousePressed(e: MouseEvent) {
             val cl = m!!.layout as CardLayout
             cl.show(m, "EXPLORATION")
         }
     })
-    b!!.add(btn_Exploration)
+    b!!.add(exploreButton)
 
     // Fastest Path Button
-    val btn_FastestPath = JButton("Fastest Path")
-    formatButton(btn_FastestPath)
-    btn_FastestPath.addMouseListener(object : MouseAdapter() {
+    val fastestPathButton = JButton("Fastest Path")
+    formatButton(fastestPathButton)
+    fastestPathButton.addMouseListener(object : MouseAdapter() {
         override fun mousePressed(e: MouseEvent) {
             val cl = m!!.layout as CardLayout
-            cl.show(m, "EXPLORATION")
+            cl.show(m, "FASTEST PATH")
         }
     })
-    b!!.add(btn_FastestPath)
+    b!!.add(fastestPathButton)
 }

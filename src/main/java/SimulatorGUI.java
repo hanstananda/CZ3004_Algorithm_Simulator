@@ -18,7 +18,7 @@ public class SimulatorGUI {
     private static MazeMap realMap = null;              // real map
     private static MazeMap exploredMap = null;          // exploration map
 
-    private static final boolean realRun = true;
+    private static final boolean realRun = false;
 
     public static void main(String[]args){
         if (!realRun) {
@@ -61,10 +61,11 @@ public class SimulatorGUI {
     }
 
     private static void initMain() {
-//        if (!realRun) {
-//            m.add(realMap, "REAL_MAP");
-//        }
-//        m.add(exploredMap, "EXPLORATION");
+        if (!realRun) {
+            m.add(realMap,"REAL MAP");
+
+        }
+        m.add(exploredMap, "EXPLORATION");
 
         CardLayout cl = ((CardLayout) m.getLayout());
         if (!realRun) {
@@ -92,7 +93,7 @@ public class SimulatorGUI {
             btn_LoadMap.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     JDialog loadMapDialog = new JDialog(f, "Load Map", true);
-                    loadMapDialog.setSize(400, 60);
+                    loadMapDialog.setSize(400, 80);
                     loadMapDialog.setLayout(new FlowLayout());
 
                     final JTextField loadTF = new JTextField(15);
@@ -104,7 +105,7 @@ public class SimulatorGUI {
                             loadMapFromDisk(realMap, loadTF.getText());
                             CardLayout cl = ((CardLayout) m.getLayout());
                             cl.show(m, "REAL_MAP");
-                            realMap.reset();
+                            realMap.repaint();
                         }
                     });
 
