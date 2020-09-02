@@ -1,9 +1,7 @@
 package robot
 
-import constants.DIRECTION
-import constants.MOVEMENT
-import constants.START_COL
-import constants.START_ROW
+
+import constants.RobotConstants
 import data.map.MazeMap
 import data.robot.Robot
 import mu.KotlinLogging
@@ -14,18 +12,18 @@ import utils.map.loadMapFromDisk
 
 class RobotRunTests {
     private val testMap: MazeMap = MazeMap()
-    private val filename = "TestMap1.txt"
+    private val filename = "TestMap1"
     private val logger = KotlinLogging.logger {}
 
     @Test
     fun `check robot initialization success`() {
-        Robot(START_ROW, START_COL)
+        Robot(RobotConstants.START_ROW, RobotConstants.START_COL)
     }
 
     @Nested
     @DisplayName("Movement tests for robot simulation")
     inner class MovementTests {
-        private val robot = Robot(START_ROW, START_COL)
+        private val robot = Robot(RobotConstants.START_ROW, RobotConstants.START_COL)
 
         @BeforeEach
         fun `Reset robot`() {
@@ -35,57 +33,57 @@ class RobotRunTests {
 
         @Test
         fun `check move forward working`() {
-            robot.move(MOVEMENT.FORWARD)
-            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
-            Assertions.assertEquals(START_ROW + 1, robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            robot.move(RobotConstants.MOVEMENT.FORWARD)
+            Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW + 1, robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
         @Test
         fun `check move backward working`() {
-            robot.setRobotPosAndDir(START_ROW + 1, START_COL, DIRECTION.NORTH)
-            robot.move(MOVEMENT.BACKWARD)
-            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
-            Assertions.assertEquals(START_ROW, robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            robot.setRobotPosAndDir(RobotConstants.START_ROW + 1, RobotConstants.START_COL, RobotConstants.DIRECTION.NORTH)
+            robot.move(RobotConstants.MOVEMENT.BACKWARD)
+            Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW, robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
         @Test
         fun `check rotate right working`() {
-            robot.move(MOVEMENT.RIGHT)
-            Assertions.assertEquals(DIRECTION.EAST, robot.robotDir)
-            Assertions.assertEquals(START_ROW, robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            robot.move(RobotConstants.MOVEMENT.RIGHT)
+            Assertions.assertEquals(RobotConstants.DIRECTION.EAST, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW, robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
         @Test
         fun `check rotate left working`() {
-            robot.move(MOVEMENT.LEFT)
-            Assertions.assertEquals(DIRECTION.WEST, robot.robotDir)
-            Assertions.assertEquals(START_ROW, robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            robot.move(RobotConstants.MOVEMENT.LEFT)
+            Assertions.assertEquals(RobotConstants.DIRECTION.WEST, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW, robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
         @Test
         fun `check forward left move loop back to position`() {
             for(i in 1..4) {
-                robot.move(MOVEMENT.FORWARD)
-                robot.move(MOVEMENT.LEFT)
+                robot.move(RobotConstants.MOVEMENT.FORWARD)
+                robot.move(RobotConstants.MOVEMENT.LEFT)
             }
-            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
-            Assertions.assertEquals(START_ROW , robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW , robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
         @Test
         fun `check right backward move loop back to position`() {
             for(i in 1..4) {
-                robot.move(MOVEMENT.RIGHT)
-                robot.move(MOVEMENT.BACKWARD)
+                robot.move(RobotConstants.MOVEMENT.RIGHT)
+                robot.move(RobotConstants.MOVEMENT.BACKWARD)
             }
-            Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir)
-            Assertions.assertEquals(START_ROW , robot.row)
-            Assertions.assertEquals(START_COL, robot.col)
+            Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
+            Assertions.assertEquals(RobotConstants.START_ROW , robot.row)
+            Assertions.assertEquals(RobotConstants.START_COL, robot.col)
         }
 
     }
@@ -93,7 +91,7 @@ class RobotRunTests {
     @Nested
     @DisplayName("Sensors testing for robot simulation")
     inner class RobotSensorTests {
-        private val robot = Robot(START_ROW, START_COL)
+        private val robot = Robot(RobotConstants.START_ROW, RobotConstants.START_COL)
         private val exploredMap = MazeMap()
 
         @BeforeEach
@@ -109,7 +107,7 @@ class RobotRunTests {
             val obstacleColFr = 5
             val obstacleColTo = 7
 
-            robot.setRobotPosAndDir(obstacleRow - 2, obstacleColFr, DIRECTION.NORTH)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleColFr, RobotConstants.DIRECTION.NORTH)
             val ans1 = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans1[0])
             Assertions.assertEquals(1, ans1[1])
@@ -134,16 +132,16 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
 
-            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, DIRECTION.NORTH)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, RobotConstants.DIRECTION.NORTH)
             var ans = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans[0])
             Assertions.assertEquals(1, ans[1])
             Assertions.assertEquals(1, ans[2])
 
-            robot.move(MOVEMENT.RIGHT)
-            robot.move(MOVEMENT.LEFT)
+            robot.move(RobotConstants.MOVEMENT.RIGHT)
+            robot.move(RobotConstants.MOVEMENT.LEFT)
             Assertions.assertAll(
-                Executable { Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir) },
+                Executable { Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir) },
                 Executable { Assertions.assertEquals(obstacleRow - 2, robot.row) },
                 Executable { Assertions.assertEquals(obstacleCol, robot.col) }
             )
@@ -159,17 +157,17 @@ class RobotRunTests {
             val obstacleRow = 8
             val obstacleCol = 5
 
-            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, DIRECTION.NORTH)
+            robot.setRobotPosAndDir(obstacleRow - 2, obstacleCol, RobotConstants.DIRECTION.NORTH)
             var ans = robot.simulateSensors(exploredMap, testMap)
             Assertions.assertEquals(-1, ans[0])
             Assertions.assertEquals(1, ans[1])
             Assertions.assertEquals(1, ans[2])
 
-            robot.move(MOVEMENT.RIGHT)
-            robot.move(MOVEMENT.FORWARD)
-            robot.move(MOVEMENT.LEFT)
+            robot.move(RobotConstants.MOVEMENT.RIGHT)
+            robot.move(RobotConstants.MOVEMENT.FORWARD)
+            robot.move(RobotConstants.MOVEMENT.LEFT)
             Assertions.assertAll(
-                Executable { Assertions.assertEquals(DIRECTION.NORTH, robot.robotDir) },
+                Executable { Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir) },
                 Executable { Assertions.assertEquals(obstacleRow - 2, robot.row) },
                 Executable { Assertions.assertEquals(obstacleCol + 1, robot.col) }
             )
@@ -185,7 +183,7 @@ class RobotRunTests {
         fun `sensing and map exploration check WEST DIRECTION`() {
             val obstacleRow = 8
             val obstacleCol = 5
-            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.WEST)
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, RobotConstants.DIRECTION.WEST)
 
             var ans = robot.simulateSensors(exploredMap, testMap)
             if (logger.isDebugEnabled) {
@@ -205,7 +203,7 @@ class RobotRunTests {
         fun `sensing and map exploration check EAST DIRECTION`() {
             val obstacleRow = 8
             val obstacleCol = 5
-            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.EAST)
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, RobotConstants.DIRECTION.EAST)
 
             val ans = robot.simulateSensors(exploredMap, testMap)
 
@@ -227,7 +225,7 @@ class RobotRunTests {
         fun `sensing and map exploration check NORTH direction`() {
             val obstacleRow = 8
             val obstacleCol = 5
-            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, DIRECTION.NORTH)
+            robot.setRobotPosAndDir(obstacleRow - 3, obstacleCol-1, RobotConstants.DIRECTION.NORTH)
             val ans = robot.simulateSensors(exploredMap, testMap)
 
             if (logger.isDebugEnabled) {
@@ -252,7 +250,7 @@ class RobotRunTests {
         fun `sensing and map exploration check SOUTH direction`() {
             val obstacleRow = 8
             val obstacleCol = 5
-            robot.setRobotPosAndDir(obstacleRow + 3, obstacleCol, DIRECTION.SOUTH)
+            robot.setRobotPosAndDir(obstacleRow + 3, obstacleCol, RobotConstants.DIRECTION.SOUTH)
             val ans = robot.simulateSensors(exploredMap, testMap)
 
             if (logger.isDebugEnabled) {
@@ -273,7 +271,7 @@ class RobotRunTests {
 
     @BeforeEach
     fun initMap() {
-        loadMapFromDisk(testMap, "/$filename")
+        loadMapFromDisk(testMap, filename)
     }
 
 }
