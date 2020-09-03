@@ -49,6 +49,12 @@ Note: Windows user may run `gradlew <command>` or `gradlew.bat <command>` instea
     ```bash 
     ./gradlew test
     ```
+    
+3.  To run the Simulation Server, run the entire project using 
+    ```bash
+    ./gradlew run
+    ```
+    
 
 Tutorial on running gradle app: https://guides.gradle.org/building-java-libraries/
 
