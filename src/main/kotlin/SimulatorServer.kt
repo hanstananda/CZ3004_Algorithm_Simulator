@@ -1,6 +1,19 @@
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import constants.*
+import constants.CommConstants.BACKWARD_COMMAND
+import constants.CommConstants.COMMAND
+import constants.CommConstants.FORWARD_COMMAND
+import constants.CommConstants.IMAGE_COMMAND
+import constants.CommConstants.LEFT_COMMAND
+import constants.CommConstants.MOVEMENT_COMMAND
+import constants.CommConstants.RIGHT_COMMAND
+import constants.CommConstants.ROTATE_COMMAND
+import constants.CommConstants.SUCCESSFUL_EXECUTION
+import constants.CommConstants.UNKNOWN_COMMAND_ERROR
+import constants.CommConstants.UNSUPPORTED_COMMAND_ERROR
+import constants.RobotConstants
+import constants.RobotConstants.START_COL
+import constants.RobotConstants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
 import io.ktor.http.cio.websocket.*
@@ -86,14 +99,14 @@ class SimulatorServer {
                 when (commandType) {
                     FORWARD_COMMAND -> {
                         for (unit in 1..units) {
-                            robot.move(MOVEMENT.FORWARD)
+                            robot.move(RobotConstants.MOVEMENT.FORWARD)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
                         sendSensorTelemetry(sender)
                     }
                     BACKWARD_COMMAND -> {
                         for (unit in 1..units) {
-                            robot.move(MOVEMENT.BACKWARD)
+                            robot.move(RobotConstants.MOVEMENT.BACKWARD)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
                         sendSensorTelemetry(sender)
@@ -108,14 +121,14 @@ class SimulatorServer {
                 when (commandType) {
                     RIGHT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
-                            robot.move(MOVEMENT.RIGHT)
+                            robot.move(RobotConstants.MOVEMENT.RIGHT)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
                         sendSensorTelemetry(sender)
                     }
                     LEFT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
-                            robot.move(MOVEMENT.LEFT)
+                            robot.move(RobotConstants.MOVEMENT.LEFT)
                         }
                         response = Gson().toJson(SUCCESSFUL_EXECUTION)
                         sendSensorTelemetry(sender)
