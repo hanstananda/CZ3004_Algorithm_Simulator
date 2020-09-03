@@ -1,3 +1,5 @@
+package simulator
+
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import constants.CommConstants.BACKWARD_COMMAND
@@ -18,9 +20,7 @@ import data.map.MazeMap
 import data.robot.Robot
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import utils.map.RandomMapGenerator
 import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -32,7 +32,7 @@ class SimulatorServer {
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
     var mazeMap = MazeMap()
     var exploredMap = MazeMap()
-    private val robot = Robot(START_ROW, START_COL)
+    val robot = Robot(START_ROW, START_COL)
 
     init {
         loadMapFromDisk(mazeMap, "BlankMap")
@@ -40,7 +40,7 @@ class SimulatorServer {
 
     suspend fun help(sender: String) {
         logger.debug { "Sending help message " }
-        members[sender]?.send(Frame.Text("[server::help] Possible commands are: /user, /help and /who"))
+        members[sender]?.send(Frame.Text("[server::help] Possible commands are: /help and /hello"))
     }
 
     suspend fun memberJoin(member: String, socket: WebSocketSession) {
