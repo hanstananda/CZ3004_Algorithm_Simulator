@@ -1,7 +1,6 @@
 package data.map
 
 import constants.MapConstants
-import constants.RobotConstants.DIRECTION
 import constants.GraphicsConstants
 import constants.RobotConstants
 import data.robot.Robot
@@ -131,8 +130,8 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
                         mapCol
                     )
                 ) GraphicsConstants.GOAL_CELL else {
-                    if (!grid[mapRow][mapCol].getIsExplored()) GraphicsConstants.UNEXPLORED_CELL else if (grid[mapRow][mapCol]
-                            .getIsObstacle()
+                    if (!grid[mapRow][mapCol].explored) GraphicsConstants.UNEXPLORED_CELL else if (grid[mapRow][mapCol]
+                            .obstacle
                     ) GraphicsConstants.OBSTACLE_CELL else GraphicsConstants.FREE_CELL
                 }
                 g.color = cellColor
@@ -147,8 +146,8 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
 
         // Paint the robot on-screen.
         g.color = GraphicsConstants.ROBOT_CELL
-        val r: Int = bot.getRobotRow()
-        val c: Int = bot.getRobotCol()
+        val r: Int = bot.row
+        val c: Int = bot.col
         g.fillOval(
             (c - 1) * GraphicsConstants.CELL_SIZE + GraphicsConstants.ROBOT_X_OFFSET + GraphicsConstants.MAP_X_OFFSET,
             GraphicsConstants.MAP_H - (r * GraphicsConstants.CELL_SIZE + GraphicsConstants.ROBOT_Y_OFFSET),
@@ -158,7 +157,7 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
 
         // Paint the robot's direction indicator on-screen.
         g.color = GraphicsConstants.ROBOT_DIR_CELL
-        val d: RobotConstants.DIRECTION = bot.getRobotDirection()
+        val d: RobotConstants.DIRECTION = bot.robotDir
         when (d) {
             RobotConstants.DIRECTION.NORTH -> g.fillOval(
                 c * GraphicsConstants.CELL_SIZE + 10 + GraphicsConstants.MAP_X_OFFSET,

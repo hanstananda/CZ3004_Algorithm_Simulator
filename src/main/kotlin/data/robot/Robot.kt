@@ -26,18 +26,6 @@ data class Robot(var startRow: Int, var startCol: Int) {
     var row: Int = startRow
     var col: Int = startCol
 
-    fun getRobotRow(): Int {
-        return row
-    }
-
-    fun getRobotCol(): Int {
-        return col
-    }
-
-    fun getRobotDirection(): RobotConstants.DIRECTION {
-        return robotDir
-    }
-
     private val sensors: Array<Sensor> = arrayOf(
         // IR Short Range Front
         Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H,
