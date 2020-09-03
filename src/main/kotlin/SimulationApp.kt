@@ -61,7 +61,7 @@ class SimulationApp {
             }
         }
 
-        logger.debug {"Server initialized successfully. Starting server routing..."}
+        logger.info {"Server initialized successfully. Starting server routing..."}
         routing {
             // This defines a websocket `/robot` route that allows a protocol upgrade to convert a HTTP request/response request
             // into a bidirectional packetized connection.

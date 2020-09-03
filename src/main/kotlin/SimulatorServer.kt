@@ -35,7 +35,7 @@ class SimulatorServer {
     private val robot = Robot(START_ROW, START_COL)
 
     init {
-        loadMapFromDisk(mazeMap, "/BlankMap.txt")
+        loadMapFromDisk(mazeMap, "BlankMap")
     }
 
     suspend fun help(sender: String) {
