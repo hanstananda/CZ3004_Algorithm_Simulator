@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import constants.CommConstants.BACKWARD_COMMAND
 import constants.CommConstants.COMMAND
+import constants.CommConstants.EXPLORATION_START_COMMAND
+import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.LEFT_COMMAND
@@ -33,6 +35,7 @@ class SimulatorServer {
     var mazeMap = MazeMap()
     var exploredMap = MazeMap()
     val robot = Robot(START_ROW, START_COL)
+    lateinit var latestMember: String
 
     init {
         loadMapFromDisk(mazeMap, "BlankMap")
@@ -54,6 +57,7 @@ class SimulatorServer {
         // But since this is a sample we are not doing it.
         val list = members.computeIfAbsent(member) { CopyOnWriteArrayList<WebSocketSession>() }
         list.add(socket)
+        latestMember = member
 
 //        // Only when joining the first socket for a member notifies the rest of the users.
 //        if (list.size == 1) {
@@ -81,6 +85,18 @@ class SimulatorServer {
 //            val name = memberNames.remove(member) ?: member
 //            broadcast("server", "Member left: $name.")
         }
+    }
+
+    suspend fun startExploration() {
+        val command = Gson().toJson(EXPLORATION_START_COMMAND)
+        members[latestMember]?.send(Frame.Text(command))
+    }
+
+    suspend fun startWaypoint(x: Int, y: Int) {
+        val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
+        commandMap["waypoint"] = "[$x,$y]"
+        val command = Gson().toJson(commandMap)
+        members[latestMember]?.send(Frame.Text(command))
     }
 
     suspend fun message(sender: String, message: String) {
