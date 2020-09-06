@@ -10,8 +10,11 @@ import constants.CommConstants.FORWARD_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.LEFT_COMMAND
 import constants.CommConstants.MOVEMENT_COMMAND
+import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
+import constants.CommConstants.SENSOR_READ_COMMAND
+import constants.CommConstants.STOP_STATUS
 import constants.CommConstants.SUCCESSFUL_EXECUTION
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
 import constants.CommConstants.UNSUPPORTED_COMMAND_ERROR
@@ -92,7 +95,7 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startWaypoint(x: Int, y: Int) {
+    suspend fun startFastestPath(x: Int, y: Int) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
@@ -117,14 +120,14 @@ class SimulatorServer {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.FORWARD)
                         }
-                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        response = Gson().toJson(STOP_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     BACKWARD_COMMAND -> {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.BACKWARD)
                         }
-                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        response = Gson().toJson(STOP_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
@@ -139,14 +142,14 @@ class SimulatorServer {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.RIGHT)
                         }
-                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        response = Gson().toJson(STOP_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     LEFT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.LEFT)
                         }
-                        response = Gson().toJson(SUCCESSFUL_EXECUTION)
+                        response = Gson().toJson(STOP_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
@@ -156,6 +159,9 @@ class SimulatorServer {
             }
             commandType.startsWith(IMAGE_COMMAND) -> {
                 response = Gson().toJson(UNSUPPORTED_COMMAND_ERROR)
+            }
+            commandType.startsWith(OBSTACLE_DETECT_COMMAND) -> {
+                response = Gson().toJson(SUCCESSFUL_EXECUTION)
             }
             else -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
@@ -170,7 +176,7 @@ class SimulatorServer {
         for (result in sensorReadings) {
             val response = Gson().toJson(
                 mapOf(
-                    "update" to "sensor_read",
+                    "update" to SENSOR_READ_COMMAND,
                     "id" to result.key,
                     "value" to result.value
                 )
