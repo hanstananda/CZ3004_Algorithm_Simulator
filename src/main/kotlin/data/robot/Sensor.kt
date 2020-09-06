@@ -12,6 +12,8 @@ data class Sensor(
     private val xSee = intArrayOf(0,1,0,-1)
     private val ySee = intArrayOf(1,0,-1,0)
 
+    init{}
+
     fun setSensor(row: Int, col: Int, dir: RobotConstants.DIRECTION) {
         this.row = row
         this.col = col
