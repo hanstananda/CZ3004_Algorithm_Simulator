@@ -3,6 +3,7 @@ package simulator
 import constants.RobotConstants
 import data.map.MazeMap
 import data.robot.Robot
+import mu.KotlinLogging
 import utils.map.loadMapFromDisk
 import java.awt.*
 import java.awt.event.KeyEvent
@@ -16,6 +17,7 @@ object Simulator {
     lateinit var f: JFrame
     lateinit var m: JPanel
     lateinit var b: JPanel
+    val logger = KotlinLogging.logger {}
 
     lateinit var sim: SimulatorMap
 
@@ -30,10 +32,9 @@ object Simulator {
 
     fun updateSimulatorMap(simulatorMap: SimulatorMap) {
         sim = simulatorMap
-
     }
 
-    private fun displayMainFrame() {
+    fun displayMainFrame() {
 
         //initialise main frame
         f = JFrame("MDP Simulator")
@@ -145,19 +146,19 @@ object Simulator {
         f.addKeyListener(object : KeyListener {
             override fun keyPressed(e: KeyEvent) {
                 if (e.keyCode == KeyEvent.VK_RIGHT) {
-                    println("right button pressed")
+                    logger.debug{ "right button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
                     sim.repaint()
                 } else if (e.keyCode == KeyEvent.VK_LEFT) {
-                    println("left button pressed")
+                    logger.debug{ "left button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.LEFT)
                     sim.repaint()
 //            } else if (e.keyCode == KeyEvent.VK_DOWN) {
-//                println("down button pressed")
+//                logger.debug{ "down button pressed" }
 //                sim.bot.move(RobotConstants.MOVEMENT.BACKWARD)
 //                sim.repaint()
                 } else if (e.keyCode == KeyEvent.VK_UP) {
-                    println("up button pressed")
+                    logger.debug{ "up button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
                     sim.repaint()
                 }
