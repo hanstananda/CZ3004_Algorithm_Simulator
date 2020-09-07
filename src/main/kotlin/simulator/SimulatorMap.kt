@@ -62,7 +62,7 @@ class SimulatorMap(var map: MazeMap, var bot: Robot) : JPanel() {
         // Paint the robot's direction indicator on-screen.
         g.color = GraphicsConstants.ROBOT_DIR_CELL
         val d: RobotConstants.DIRECTION = bot.robotDir
-        when (d) {
+        when(d) {
             RobotConstants.DIRECTION.NORTH -> g.fillOval(
                     c * GraphicsConstants.CELL_SIZE + 10 + GraphicsConstants.MAP_X_OFFSET,
                     GraphicsConstants.MAP_H - r * GraphicsConstants.CELL_SIZE - 15,

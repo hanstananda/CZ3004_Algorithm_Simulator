@@ -13,7 +13,6 @@ import javax.swing.JPanel
 
 data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize: Int = MapConstants.DEFAULT_COL_SIZE) : JPanel() {
     var grid: Array<Array<Cell>> = Array(rowSize) { i -> Array(colSize) { j -> Cell(i, j)} }
-    private var bot: Robot = Robot(1,1)
     private val xMove = intArrayOf(-1,0,1)
     private val yMove = intArrayOf(-1,0,1)
 
@@ -35,7 +34,7 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
         setAllUnexplored()
     }
 
-    fun resetAllObstacle() {
+    private fun resetAllObstacle() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
                 grid[row][col].obstacle = false;
