@@ -1,6 +1,7 @@
 package data.robot
 
 import constants.RobotConstants
+import com.google.gson.JsonObject
 import data.map.MazeMap
 import mu.KotlinLogging
 
@@ -11,13 +12,20 @@ data class Sensor(
     private val logger = KotlinLogging.logger {}
     private val xSee = intArrayOf(0,1,0,-1)
     private val ySee = intArrayOf(1,0,-1,0)
-
-    init{}
+    private var lastReading = -1
 
     fun setSensor(row: Int, col: Int, dir: RobotConstants.DIRECTION) {
         this.row = row
         this.col = col
         this.dir = dir
+    }
+
+    fun getJson():JsonObject {
+        val json = JsonObject()
+        json.addProperty("update", "sensor_read")
+        json.addProperty("value", lastReading)
+        json.addProperty("id", id)
+        return json
     }
 
     /**
@@ -26,30 +34,39 @@ data class Sensor(
      */
     fun simulateSense(exploredMap: MazeMap, realMap: MazeMap): Int {
         logger.debug{ "%s %d %d".format(dir.print(), ySee[dir.ordinal], xSee[dir.ordinal])}
+        lastReading = -1
         for(i in 1 until lowerRange) {
             val rPos = this.row + ySee[dir.ordinal]*i
             val cPos = this.col + xSee[dir.ordinal]*i
             if(!realMap.checkValidCoordinates(rPos, cPos)) {
-                return i
+                lastReading = i
+                break
             }
             if(realMap.grid[rPos][cPos].obstacle) {
-                return i
+                lastReading = i
+                break
             }
+        }
+
+        if(lastReading!=-1) {
+            return lastReading
         }
 
         for(i in lowerRange..upperRange) {
             val rPos = this.row + ySee[dir.ordinal]*i
             val cPos = this.col + xSee[dir.ordinal]*i
             if(!realMap.checkValidCoordinates(rPos, cPos)) {
-                return i
+                lastReading = i
+                break
             }
             exploredMap.grid[rPos][cPos].explored = true
 
             if(realMap.grid[rPos][cPos].obstacle) {
                 exploredMap.setObstacle(rPos, cPos)
-                return i
+                lastReading = i
+                break
             }
         }
-        return -1
+        return lastReading
     }
 }
