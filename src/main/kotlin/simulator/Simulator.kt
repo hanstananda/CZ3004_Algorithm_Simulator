@@ -32,6 +32,9 @@ object Simulator {
 
     fun updateSimulatorMap(simulatorMap: SimulatorMap) {
         sim = simulatorMap
+        if(this::m.isInitialized) {
+            m.repaint()
+        }
     }
 
     fun displayMainFrame() {
@@ -101,7 +104,7 @@ object Simulator {
                         val newMap = MazeMap()
                         loadMapDialog.isVisible = false
                         loadMapFromDisk(newMap, loadTF.text)
-                        sim.map = newMap
+                        sim = SimulatorMap(newMap, sim.bot)
                         val cl = m.layout as CardLayout
                         cl.show(m, "REAL_MAP")
                         sim.repaint()
@@ -148,19 +151,19 @@ object Simulator {
                 if (e.keyCode == KeyEvent.VK_RIGHT) {
                     logger.debug{ "right button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
-                    sim.repaint()
+                    m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_LEFT) {
                     logger.debug{ "left button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.LEFT)
-                    sim.repaint()
+                    m.repaint()
 //            } else if (e.keyCode == KeyEvent.VK_DOWN) {
 //                logger.debug{ "down button pressed" }
 //                sim.bot.move(RobotConstants.MOVEMENT.BACKWARD)
-//                sim.repaint()
+//                m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_UP) {
                     logger.debug{ "up button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
-                    sim.repaint()
+                    m.repaint()
                 }
             }
 
