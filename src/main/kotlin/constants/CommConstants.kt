@@ -17,9 +17,8 @@ internal object CommConstants {
     val MOVING_STATUS = mapOf("status" to "moving")
     val ROTATING_STATUS = mapOf("status" to "rotating")
     val STOP_STATUS = mapOf("status" to "stopped")
-    val SUCCESSFUL_EXECUTION = mapOf("Result" to "Successful")
-    val UNKNOWN_COMMAND_ERROR = mapOf("Result" to "Unknown Command!")
-    val UNSUPPORTED_COMMAND_ERROR = mapOf("Result" to "Unsupported Command!")
+    val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
+    val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")
     val EXPLORATION_START_COMMAND = mapOf("request" to "start_explore")
     val FASTEST_PATH_START_COMMAND = mapOf("request" to "start_fastest_path")
 }
