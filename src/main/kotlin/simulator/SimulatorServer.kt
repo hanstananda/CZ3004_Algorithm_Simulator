@@ -42,6 +42,8 @@ class SimulatorServer {
 
     init {
         loadMapFromDisk(mazeMap, "BlankMap")
+        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
+        Simulator.displayMainFrame()
     }
 
     suspend fun help(sender: String) {
@@ -95,7 +97,7 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startFastestPath(x: Int, y: Int) {
+    suspend fun startWaypoint(x: Int, y: Int) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
@@ -108,7 +110,7 @@ class SimulatorServer {
 
         // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
         val commandType: String? = request[COMMAND]
-        var response = ""
+        val response: String
         when {
             commandType == null -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)

@@ -1,88 +1,92 @@
 package simulator
 
+import constants.RobotConstants
 import data.map.MazeMap
+import data.robot.Robot
+import mu.KotlinLogging
 import utils.map.loadMapFromDisk
 import java.awt.*
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-private var f: JFrame? = null
-private var m: JPanel? = null
-private var b: JPanel? = null
+object Simulator {
 
-private val bot: Robot? = null
+    lateinit var f: JFrame
+    lateinit var m: JPanel
+    lateinit var b: JPanel
+    val logger = KotlinLogging.logger {}
 
-private var realMap: MazeMap? = null // real map
+    lateinit var sim: SimulatorMap
 
-private var exploredMap: MazeMap? = null // exploration map
-
-private val realRun = false
-
-fun main(args: Array<String>) {
-    if (!realRun) {
-        realMap = MazeMap()
-        realMap!!.setAllUnexplored()
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val map = MazeMap()
+        map.setAllUnexplored()
+        val bot = Robot(1, 1)
+        sim = SimulatorMap(map, bot)
+        displayMainFrame()
     }
-    exploredMap = MazeMap()
-    exploredMap!!.setAllUnexplored()
-    displayMainFrame()
-}
 
-private fun displayMainFrame() {
-
-    //initialise main frame
-    f = JFrame("MDP Simulator")
-    f!!.size = Dimension(690, 700)
-    f!!.isResizable = false
-
-    //center main frame
-    val dim = Toolkit.getDefaultToolkit().screenSize
-    f!!.setLocation(dim.width / 2 - f!!.size.width / 2, dim.height / 2 - f!!.size.height / 2)
-
-    //create CardLayout for storing different maps
-    m = JPanel(CardLayout())
-
-    //create JPanel for buttons
-    b = JPanel()
-
-    //add m & b to the main frame's content pane
-    val contentPane = f!!.contentPane
-    contentPane.add(m, BorderLayout.CENTER)
-    contentPane.add(b, BorderLayout.PAGE_END)
-    initMain()
-    initButtons()
-    f!!.isVisible = true
-    f!!.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-}
-
-private fun initMain() {
-    if (!realRun) {
-        m?.add(realMap, "REAL_MAP");
+    fun updateSimulatorMap(simulatorMap: SimulatorMap) {
+        sim = simulatorMap
     }
-    m?.add(exploredMap, "EXPLORATION");
-    val cl = m!!.layout as CardLayout
-    if (!realRun) {
-        cl.show(m, "REAL_MAP")
-    } else {
-        cl.show(m, "EXPLORATION")
+
+    fun displayMainFrame() {
+
+        //initialise main frame
+        f = JFrame("MDP Simulator")
+        f.size = Dimension(690, 700)
+        f.isResizable = false
+        f.isFocusable = true
+        f.focusTraversalKeysEnabled = false;
+
+        //center main frame
+        val dim = Toolkit.getDefaultToolkit().screenSize
+        f.setLocation(dim.width / 2 - f.size.width / 2, dim.height / 2 - f.size.height / 2)
+
+        //create CardLayout for storing different maps and robot
+        m = JPanel(CardLayout())
+
+        //create JPanel for buttons
+        b = JPanel()
+
+        //add m & b to the main frame's content pane
+        val contentPane = f.contentPane
+        contentPane.add(m, BorderLayout.CENTER)
+        contentPane.add(b, BorderLayout.PAGE_END)
+        initMain()
+        initButtons()
+
+        // movement buttons to move robot
+        initMovementButtons()
+
+        f.isVisible = true
+        f.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
     }
-}
 
-private fun initButtons() {
-    b!!.layout = GridLayout()
-    addButtons()
-}
+    private fun initMain() {
+        m.add(sim, "MAP")
+        val cl = m.layout as CardLayout
+        cl.show(m, "MAP")
+    }
 
-private fun formatButton(btn: JButton) {
-    btn.font = Font("Arial", Font.BOLD, 13)
-    btn.isFocusPainted = false
-}
+    private fun initButtons() {
+        b.layout = GridLayout()
+        addButtons()
+    }
 
-private fun addButtons() {
-    if (!realRun) {
+    private fun formatButton(btn: JButton) {
+        btn.font = Font("Arial", Font.BOLD, 13)
+        btn.isFocusPainted = false
+    }
+
+    private fun addButtons() {
         // Load Map Button
         val loadMapButton = JButton("Load Map")
+        loadMapButton.isFocusable = false
         formatButton(loadMapButton)
         loadMapButton.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
@@ -91,13 +95,16 @@ private fun addButtons() {
                 loadMapDialog.layout = FlowLayout()
                 val loadTF = JTextField(15)
                 val loadButton = JButton("Load")
+                loadButton.isFocusable = false
                 loadButton.addMouseListener(object : MouseAdapter() {
                     override fun mousePressed(e: MouseEvent) {
+                        val newMap = MazeMap()
                         loadMapDialog.isVisible = false
-                        loadMapFromDisk(realMap!!, loadTF.text)
-                        val cl = m!!.layout as CardLayout
+                        loadMapFromDisk(newMap, loadTF.text)
+                        sim.map = newMap
+                        val cl = m.layout as CardLayout
                         cl.show(m, "REAL_MAP")
-                        realMap!!.repaint()
+                        sim.repaint()
                     }
                 })
                 loadMapDialog.add(JLabel("File Name: "))
@@ -106,29 +113,63 @@ private fun addButtons() {
                 loadMapDialog.isVisible = true
             }
         })
-        b!!.add(loadMapButton)
+        b.add(loadMapButton)
+
+
+
+        // Exploration Button
+        val exploreButton = JButton("Exploration")
+        formatButton(exploreButton)
+        exploreButton.isFocusable = false
+        exploreButton.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                val cl = m.layout as CardLayout
+                cl.show(m, "EXPLORATION")
+            }
+        })
+        b.add(exploreButton)
+
+        // Fastest Path Button
+        val fastestPathButton = JButton("Fastest Path")
+        formatButton(fastestPathButton)
+        fastestPathButton.isFocusable = false
+        fastestPathButton.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                val cl = m.layout as CardLayout
+                cl.show(m, "FASTEST PATH")
+            }
+        })
+        b.add(fastestPathButton)
     }
 
+    private fun initMovementButtons() {
+        f.addKeyListener(object : KeyListener {
+            override fun keyPressed(e: KeyEvent) {
+                if (e.keyCode == KeyEvent.VK_RIGHT) {
+                    logger.debug{ "right button pressed" }
+                    sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
+                    sim.repaint()
+                } else if (e.keyCode == KeyEvent.VK_LEFT) {
+                    logger.debug{ "left button pressed" }
+                    sim.bot.move(RobotConstants.MOVEMENT.LEFT)
+                    sim.repaint()
+//            } else if (e.keyCode == KeyEvent.VK_DOWN) {
+//                logger.debug{ "down button pressed" }
+//                sim.bot.move(RobotConstants.MOVEMENT.BACKWARD)
+//                sim.repaint()
+                } else if (e.keyCode == KeyEvent.VK_UP) {
+                    logger.debug{ "up button pressed" }
+                    sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
+                    sim.repaint()
+                }
+            }
 
-    // Exploration Button
-    val exploreButton = JButton("Exploration")
-    formatButton(exploreButton)
-    exploreButton.addMouseListener(object : MouseAdapter() {
-        override fun mousePressed(e: MouseEvent) {
-            val cl = m!!.layout as CardLayout
-            cl.show(m, "EXPLORATION")
-        }
-    })
-    b!!.add(exploreButton)
+            override fun keyTyped(e: KeyEvent) {
+            }
 
-    // Fastest Path Button
-    val fastestPathButton = JButton("Fastest Path")
-    formatButton(fastestPathButton)
-    fastestPathButton.addMouseListener(object : MouseAdapter() {
-        override fun mousePressed(e: MouseEvent) {
-            val cl = m!!.layout as CardLayout
-            cl.show(m, "FASTEST PATH")
-        }
-    })
-    b!!.add(fastestPathButton)
+            override fun keyReleased(e: KeyEvent) {
+            }
+        })
+    }
 }
+

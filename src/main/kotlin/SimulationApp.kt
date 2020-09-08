@@ -65,7 +65,7 @@ class SimulationApp {
             // This defines a websocket `/robot` route that allows a protocol upgrade to convert a HTTP request/response request
             // into a bidirectional packetized connection.
             webSocket("/robot") { // this: WebSocketSession ->
-                logger.debug {"Test run /robot "}
+                logger.debug {"Test run server endpoint on /robot "}
                 // First of all we get the session.
                 val session = call.sessions.get<CommSession>()
 
@@ -126,7 +126,6 @@ class SimulationApp {
         when {
             command.startsWith("/hello") -> {
                 logger.debug {"Hello received "}
-
             }
             // The command 'help' allows users to get a list of available commands.
             command.startsWith("/help") -> server.help(id)
