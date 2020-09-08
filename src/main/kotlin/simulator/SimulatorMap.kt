@@ -1,6 +1,7 @@
 package simulator
 
 import constants.GraphicsConstants
+import constants.GraphicsConstants.MAP_X_OFFSET
 import constants.MapConstants
 import constants.RobotConstants
 import data.map.MazeMap
@@ -21,6 +22,8 @@ class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
                 )
             }
         }
+        // Clear previous paintings
+        super.paintComponent(g);
 
         // Paint the cells with the appropriate colors.
         for (mapRow in 0 until MapConstants.DEFAULT_ROW_SIZE) {
