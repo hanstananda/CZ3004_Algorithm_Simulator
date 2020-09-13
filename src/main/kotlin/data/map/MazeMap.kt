@@ -59,18 +59,18 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
         }
     }
 
-    fun setObstacle(row: Int, col: Int) {
+    fun setObstacle(row: Int, col: Int, obstacle: Boolean) {
         if (inStartZone(row, col) || inGoalZone(row, col)) {
             return
         }
-        grid[row][col].obstacle = true
+        grid[row][col].obstacle = obstacle
         for(x in xMove) {
             for (y in yMove) {
                 val rowT = row + y
                 val colT = col + x
                 if(checkValidCoordinates(rowT, colT)) {
                     //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
-                    grid[rowT][colT].virtualWall = true;
+                    grid[rowT][colT].virtualWall = obstacle
                 }
             }
         }

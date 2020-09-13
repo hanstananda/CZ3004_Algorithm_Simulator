@@ -43,6 +43,8 @@ test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+    // Server must run when this is not excluded !
+//    exclude '**/integration/**' // Comment this if integration test needed to be run.
 }
 
 compileKotlin {

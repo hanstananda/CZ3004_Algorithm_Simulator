@@ -26,6 +26,7 @@ import data.robot.Robot
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import mu.KotlinLogging
+import utils.map.RandomMapGenerator
 import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -101,11 +102,15 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startWaypoint(x: Int, y: Int) {
+    suspend fun startWaypoint(x: Int = START_COL, y: Int = START_ROW) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
         members[latestMember]?.send(Frame.Text(command))
+    }
+
+    suspend fun generateRandomMap() {
+        mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
     }
 
     suspend fun message(sender: String, message: String) {
@@ -212,4 +217,12 @@ class SimulatorServer {
     suspend fun sendTo(recipient: String, sender: String, message: String) {
         members[recipient]?.send(Frame.Text("[$sender] $message"))
     }
+
+    fun resetRobot() {
+        exploredMap = MazeMap()
+        loadMapFromDisk(mazeMap, "TestMap1")
+        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
+        robot.resetRobot()
+    }
+
 }

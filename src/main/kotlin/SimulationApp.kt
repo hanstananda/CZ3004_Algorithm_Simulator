@@ -126,9 +126,18 @@ class SimulationApp {
         when {
             command.startsWith("/hello") -> {
                 logger.debug {"Hello received "}
+                server.sendTo(
+                    id,
+                    "server",
+                    "Hello"
+                )
             }
             // The command 'help' allows users to get a list of available commands.
             command.startsWith("/help") -> server.help(id)
+            command.startsWith("/generate_random_map") -> server.generateRandomMap()
+            command.startsWith("/force_start_exploration") -> server.startExploration()
+            command.startsWith("/force_start_fastest_path") -> server.startWaypoint()
+            command.startsWith("/force_reset") -> server.resetRobot()
             // If no commands matched at this point, we notify about it.
             command.startsWith("/") -> server.sendTo(
                 id,
