@@ -6,18 +6,18 @@ import constants.CommConstants.BACKWARD_COMMAND
 import constants.CommConstants.COMMAND
 import constants.CommConstants.EXPLORATION_START_COMMAND
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
+import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.LEFT_COMMAND
+import constants.CommConstants.LOAD_TEST_MAP_COMMAND
 import constants.CommConstants.MOVEMENT_COMMAND
-import constants.CommConstants.MOVING_STATUS
 import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.STOP_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
-import constants.CommConstants.UNSUPPORTED_COMMAND_ERROR
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
@@ -26,6 +26,8 @@ import data.robot.Robot
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import mu.KotlinLogging
+import utils.map.RandomMapGenerator
+import utils.map.debugMap
 import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -35,10 +37,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 class SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
-    var mazeMap = MazeMap()
-    var exploredMap = MazeMap()
-    val robot = Robot(START_ROW, START_COL)
     lateinit var latestMember: String
+
+    companion object {
+        var mazeMap = MazeMap()
+        var exploredMap = MazeMap()
+        val robot = Robot(START_ROW, START_COL)
+    }
 
     init {
         loadMapFromDisk(mazeMap, "TestMap1")
@@ -46,7 +51,10 @@ class SimulatorServer {
         Simulator.displayMainFrame()
     }
 
-    suspend fun updateSimulation() {
+    private fun updateSimulation() {
+//        if (logger.isDebugEnabled) {
+//            debugMap(mazeMap = exploredMap, robot = robot)
+//        }
         Simulator.updateSimulatorMap(SimulatorMap(mazeMap, robot))
     }
 
@@ -101,11 +109,16 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startWaypoint(x: Int, y: Int) {
+    suspend fun startWaypoint(x: Int = START_COL, y: Int = START_ROW) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
         members[latestMember]?.send(Frame.Text(command))
+    }
+
+    fun generateRandomMap() {
+        mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
+        updateSimulation()
     }
 
     suspend fun message(sender: String, message: String) {
@@ -169,6 +182,11 @@ class SimulatorServer {
             commandType.startsWith(OBSTACLE_DETECT_COMMAND) -> {
                 response = Gson().toJson(STOP_STATUS)
             }
+            commandType.startsWith(LOAD_TEST_MAP_COMMAND) -> {
+                val filename = request["filename"] ?: "TestMap1"
+                loadMapFromDisk(mazeMap, filename)
+                response = Gson().toJson(FINISHED_COMMAND)
+            }
             else -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
             }
@@ -188,6 +206,7 @@ class SimulatorServer {
                     "value" to result.value
                 )
             )
+            logger.debug { response }
             members[sender]?.send(Frame.Text(response))
         }
     }
@@ -212,4 +231,13 @@ class SimulatorServer {
     suspend fun sendTo(recipient: String, sender: String, message: String) {
         members[recipient]?.send(Frame.Text("[$sender] $message"))
     }
+
+    fun resetRobot() {
+        exploredMap = MazeMap()
+        loadMapFromDisk(mazeMap, "TestMap1")
+        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
+        robot.resetRobot()
+        updateSimulation()
+    }
+
 }

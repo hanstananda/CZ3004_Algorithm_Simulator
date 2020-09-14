@@ -24,16 +24,17 @@ object Simulator {
     @JvmStatic
     fun main(args: Array<String>) {
         val map = MazeMap()
-        map.setAllUnexplored()
+        map.initExploredAreas()
         val bot = Robot(1, 1)
         sim = SimulatorMap(map, bot)
         displayMainFrame()
     }
 
-    fun updateSimulatorMap(simulatorMap: SimulatorMap) {
+    fun updateSimulatorMap(simulatorMap: SimulatorMap = sim) {
         sim = simulatorMap
         if(this::m.isInitialized) {
             m.repaint()
+            logger.debug { "Map repainted!" }
         }
     }
 
@@ -101,13 +102,9 @@ object Simulator {
                 loadButton.isFocusable = false
                 loadButton.addMouseListener(object : MouseAdapter() {
                     override fun mousePressed(e: MouseEvent) {
-                        val newMap = MazeMap()
                         loadMapDialog.isVisible = false
-                        loadMapFromDisk(newMap, loadTF.text)
-                        sim = SimulatorMap(newMap, sim.bot)
-                        val cl = m.layout as CardLayout
-                        cl.show(m, "REAL_MAP")
-                        sim.repaint()
+                        loadMapFromDisk(sim.map, loadTF.text)
+                        updateSimulatorMap()
                     }
                 })
                 loadMapDialog.add(JLabel("File Name: "))

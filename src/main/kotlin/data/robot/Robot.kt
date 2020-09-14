@@ -69,7 +69,7 @@ data class Robot(var startRow: Int, var startCol: Int) {
         )
     )
 
-    private val sensorMap: Map<String, Sensor> = sensors.associateBy({ it.id }, { it })
+    val sensorMap: MutableMap<String, Sensor> = sensors.map{ it.id to it }.toMap() as MutableMap<String, Sensor>
 
     private fun updateSensorPos() {
         when (robotDir) {
@@ -115,6 +115,9 @@ data class Robot(var startRow: Int, var startCol: Int) {
                 sensors[5].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
 
             }
+        }
+        for(sensor in sensors) {
+            sensorMap[sensor.id] = sensor
         }
     }
 
