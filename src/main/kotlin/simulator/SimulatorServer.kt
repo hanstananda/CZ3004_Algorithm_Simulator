@@ -27,6 +27,7 @@ import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import mu.KotlinLogging
 import utils.map.RandomMapGenerator
+import utils.map.debugMap
 import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -47,7 +48,10 @@ class SimulatorServer {
         Simulator.displayMainFrame()
     }
 
-    fun updateSimulation() {
+    private fun updateSimulation() {
+//        if (logger.isDebugEnabled) {
+//            debugMap(mazeMap = exploredMap, robot = robot)
+//        }
         Simulator.updateSimulatorMap(SimulatorMap(mazeMap, robot))
     }
 
@@ -111,6 +115,7 @@ class SimulatorServer {
 
     fun generateRandomMap() {
         mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
+        updateSimulation()
     }
 
     suspend fun message(sender: String, message: String) {
@@ -228,6 +233,7 @@ class SimulatorServer {
         loadMapFromDisk(mazeMap, "TestMap1")
         Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
         robot.resetRobot()
+        updateSimulation()
     }
 
 }

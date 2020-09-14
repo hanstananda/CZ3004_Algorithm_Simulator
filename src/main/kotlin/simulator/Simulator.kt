@@ -34,6 +34,7 @@ object Simulator {
         sim = simulatorMap
         if(this::m.isInitialized) {
             m.repaint()
+            logger.debug { "Map repainted!" }
         }
     }
 

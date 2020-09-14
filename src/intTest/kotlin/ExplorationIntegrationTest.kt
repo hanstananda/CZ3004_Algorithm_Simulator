@@ -10,6 +10,7 @@ import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
+import main
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.*
@@ -20,6 +21,7 @@ import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import simulator.Simulator.logger
 import utils.map.debugMap
+import java.lang.Thread.sleep
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
@@ -30,6 +32,20 @@ class ExplorationIntegrationTest {
 
     private val client = HttpClient {
         install(WebSockets)
+    }
+
+    private val thread = Thread {
+        main(arrayOf())
+    }
+
+    init {
+        thread.start()
+        sleep(TimeUnit.SECONDS.toMillis(5)) // wait for server to fully run
+    }
+
+    protected fun finalize() {
+        thread.interrupt()
+        sleep(TimeUnit.SECONDS.toMillis(5)) // wait for server to fully shut down
     }
 
     @Test
@@ -83,7 +99,7 @@ class ExplorationIntegrationTest {
         private val startRow: Int,
         private val startCol: Int,
         private val coverageLimit: Int = DEFAULT_MAP_SIZE,
-        timeLimit: Long = 60,
+        timeLimit: Long = 10,
     ) {
 
         private val bot: Robot = Robot(startRow, startCol)
@@ -198,7 +214,7 @@ class ExplorationIntegrationTest {
                     }
                 }
             }
-            debugMap(mazeMap = exploredMap, robot = bot)
+//            debugMap(mazeMap = exploredMap, robot = bot)
 
         }
 

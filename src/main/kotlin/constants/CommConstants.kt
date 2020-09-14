@@ -1,6 +1,6 @@
 package constants
 
-internal object CommConstants {
+object CommConstants {
 
     const val COMMAND = "command" // Total number of columns
     const val FORWARD_COMMAND = "move_front"
