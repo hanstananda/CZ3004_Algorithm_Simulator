@@ -76,21 +76,21 @@ data class Sensor(
     /**
      * Sets the correct cells to explored and/or obstacle according to the actual sensor value.
      */
-    private fun processSensorVal(exploredMap: MazeMap, sensorVal: Int, rowInc: Int, colInc: Int) {
+    fun processSensorVal(exploredMap: MazeMap, sensorVal: Int) {
         if (sensorVal == 0) return  // return value for LR sensor if obstacle before lowerRange
 
         // If above fails, check if starting point is valid for sensors with lowerRange > 1.
         for (i in 1 until lowerRange) {
-            val row: Int = this.row + rowInc * i
-            val col: Int = this.col + colInc * i
+            val row: Int = this.row + ySee[dir.ordinal] * i
+            val col: Int = this.col + xSee[dir.ordinal] * i
             if (!exploredMap.checkValidCoordinates(row, col)) return
             if (exploredMap.grid[row][col].obstacle) return
         }
 
         // Update map according to sensor's value.
         for (i in lowerRange..upperRange) {
-            val row: Int = this.row + rowInc * i
-            val col: Int = this.col + colInc * i
+            val row: Int = this.row + ySee[dir.ordinal] * i
+            val col: Int = this.col + xSee[dir.ordinal] * i
             if (!exploredMap.checkValidCoordinates(row, col)) continue
             exploredMap.grid[row][col].explored = true
             if (sensorVal == i) {

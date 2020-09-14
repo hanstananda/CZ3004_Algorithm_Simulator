@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import simulator.Simulator.logger
+import utils.map.debugMap
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
@@ -44,16 +45,16 @@ class ExplorationIntegrationTest {
                 send("/force_start_exploration")
 
                 // Receive frame.
-                while(!incoming.isEmpty) {
-                    when (val frame = incoming.receive()) {
-                        is Frame.Text -> {
-                            val reply = frame.readText()
-                            logger.info { reply }
-                        }
-//                    is Frame.Binary -> println(frame.readBytes())
+                when (val frame = incoming.receive()) {
+                    is Frame.Text -> {
+                        val reply = frame.readText()
+                        logger.info { reply }
                     }
+//                    is Frame.Binary -> println(frame.readBytes())
                 }
+
                 val run = Exploration(this, START_ROW, START_COL )
+                run.startCalibration()
                 run.explorationLoop()
                 client.close()
             }
@@ -74,6 +75,12 @@ class ExplorationIntegrationTest {
         private var areaExplored = 0
         private var exploredMap = MazeMap()
 
+        fun startCalibration() {
+            moveBot(RobotConstants.MOVEMENT.RIGHT)
+            moveBot(RobotConstants.MOVEMENT.RIGHT)
+            moveBot(RobotConstants.MOVEMENT.LEFT)
+            moveBot(RobotConstants.MOVEMENT.LEFT)
+        }
 
         fun explorationLoop() {
             var counter = 0
@@ -87,7 +94,7 @@ class ExplorationIntegrationTest {
                     }
                 }
                 counter+=1
-                if(counter>0) {
+                if(counter>10) {
                     break
                 }
             } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime)
@@ -107,6 +114,8 @@ class ExplorationIntegrationTest {
         }
 
         private fun nextMove() {
+            logger.debug { " ${lookFree(RobotConstants.DIRECTION.getNext(bot.robotDir))} ${lookFree(bot.robotDir)} ${lookFree(RobotConstants.DIRECTION.getPrev(bot.robotDir))}"}
+
             when {
                 lookFree(RobotConstants.DIRECTION.getNext(bot.robotDir)) -> {
                     moveBot(RobotConstants.MOVEMENT.RIGHT)
@@ -120,6 +129,7 @@ class ExplorationIntegrationTest {
                     if (lookFree(bot.robotDir)) moveBot(RobotConstants.MOVEMENT.FORWARD)
                 }
                 else -> {
+                    logger.debug{ "Turning around! "}
                     // Turn around
                     moveBot(RobotConstants.MOVEMENT.RIGHT)
                     moveBot(RobotConstants.MOVEMENT.RIGHT)
@@ -128,33 +138,49 @@ class ExplorationIntegrationTest {
         }
 
         private fun moveBot(m: RobotConstants.MOVEMENT) {
-            bot.move(m)
+            val movementCommand:String = when(m){
+                RobotConstants.MOVEMENT.FORWARD -> CommConstants.FORWARD_COMMAND
+                RobotConstants.MOVEMENT.BACKWARD -> CommConstants.BACKWARD_COMMAND
+                RobotConstants.MOVEMENT.RIGHT -> CommConstants.RIGHT_COMMAND
+                RobotConstants.MOVEMENT.LEFT -> CommConstants.LEFT_COMMAND
+            }
+            logger.debug{ "Sending command $movementCommand"}
             val payload = Gson().toJson(
                 mapOf(
-                    CommConstants.COMMAND to CommConstants.FORWARD_COMMAND,
+                    CommConstants.COMMAND to movementCommand,
                     "units" to 1,
                 )
             )
+
+            bot.move(m)
             runBlocking {
                 commSession.send(Frame.Text(payload))
-                while(!commSession.incoming.isEmpty) {
+                while(true) {
                     when (val frame = commSession.incoming.receive()) {
                         is Frame.Text -> {
                             val reply = frame.readText()
                             logger.debug { "reply is $reply" }
                             val response: Map<String, String> =
                                 Gson().fromJson(reply, object : TypeToken<HashMap<String, String>>() {}.type)
-                            val type = response.get("update")
+                            val type = response["update"]
+
                             if (type!= null && type=="sensor_read") {
+                                val sensorId = response.getValue("id")
+                                val sensorValue = response.getValue("value").toInt()
                                 logger.debug {
-                                    "Processing ${response.getValue("id")} : ${response.getValue("value")}"
+                                    "Processing $sensorId : $sensorValue"
                                 }
+                                bot.sensorMap[sensorId]!!.processSensorVal(exploredMap, sensorValue)
+                            }
+                            else {
+                                break;
                             }
                         }
 //                    is Frame.Binary -> println(frame.readBytes())
                     }
                 }
             }
+            debugMap(mazeMap = exploredMap, robot = bot)
 
         }
 
@@ -168,27 +194,27 @@ class ExplorationIntegrationTest {
         }
 
         private fun northFree(): Boolean {
-            return isExploredNotObstacle(bot.row + 1, bot.col - 1) &&
-                    isExploredAndFree(bot.row + 1, bot.col) &&
-                    isExploredNotObstacle(bot.row + 1, bot.col + 1)
+            return isExploredNotObstacle(bot.row + 2, bot.col - 1) &&
+                    isExploredAndFree(bot.row + 2, bot.col) &&
+                    isExploredNotObstacle(bot.row + 2, bot.col + 1)
         }
 
         private fun eastFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 1, bot.col + 1) &&
-                    isExploredAndFree(bot.row, bot.col + 1) &&
-                    isExploredNotObstacle(bot.row + 1, bot.col + 1)
+            return isExploredNotObstacle(bot.row - 1, bot.col + 2) &&
+                    isExploredAndFree(bot.row, bot.col + 2) &&
+                    isExploredNotObstacle(bot.row + 1, bot.col + 2)
         }
 
         private fun southFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 1, bot.col - 1) &&
-                    isExploredAndFree(bot.row - 1, bot.col) &&
-                    isExploredNotObstacle(bot.row - 1, bot.col + 1)
+            return isExploredNotObstacle(bot.row - 2, bot.col - 1) &&
+                    isExploredAndFree(bot.row - 2, bot.col) &&
+                    isExploredNotObstacle(bot.row - 2, bot.col + 1)
         }
 
         private fun westFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 1, bot.col - 1) &&
-                    isExploredAndFree(bot.row, bot.col - 1) &&
-                    isExploredNotObstacle(bot.row + 1, bot.col - 1)
+            return isExploredNotObstacle(bot.row - 1, bot.col - 2) &&
+                    isExploredAndFree(bot.row, bot.col - 2) &&
+                    isExploredNotObstacle(bot.row + 1, bot.col - 2)
         }
 
 
@@ -197,6 +223,7 @@ class ExplorationIntegrationTest {
          */
         private fun isExploredNotObstacle(r: Int, c: Int): Boolean {
             if (exploredMap.checkValidCoordinates(r, c)) {
+                //logger.debug{ "Checking cell ($r,$c) = ${exploredMap.grid[r][c].explored}, ${exploredMap.grid[r][c].obstacle}"}
                 return (exploredMap.grid[r][c].explored && !(exploredMap.grid[r][c].obstacle))
             }
             return false
@@ -207,6 +234,7 @@ class ExplorationIntegrationTest {
          */
         private fun isExploredAndFree(r: Int, c: Int): Boolean {
             if (exploredMap.checkValidCoordinates(r, c)) {
+//            logger.debug{ "Checking cell ($r,$c) = ${exploredMap.grid[r][c].explored}, ${exploredMap.grid[r][c].obstacle}, ${exploredMap.grid[r][c].virtualWall}"}
                 return (exploredMap.grid[r][c].explored && !(exploredMap.grid[r][c].obstacle) && !(exploredMap.grid[r][c].virtualWall))
             }
             return false
