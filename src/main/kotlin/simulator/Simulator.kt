@@ -24,7 +24,7 @@ object Simulator {
     @JvmStatic
     fun main(args: Array<String>) {
         val map = MazeMap()
-        map.setAllUnexplored()
+        map.initExploredAreas()
         val bot = Robot(1, 1)
         sim = SimulatorMap(map, bot)
         displayMainFrame()

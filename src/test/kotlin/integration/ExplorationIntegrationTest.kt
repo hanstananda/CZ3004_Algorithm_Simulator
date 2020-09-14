@@ -3,6 +3,8 @@ package integration
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import constants.CommConstants
+import constants.CommConstants.LOAD_TEST_MAP_COMMAND
+import constants.MapConstants.DEFAULT_MAP_SIZE
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
@@ -40,24 +42,38 @@ class ExplorationIntegrationTest {
             ) { // this: DefaultClientWebSocketSession
                 session = this
 
-                // Send text frame.
+                // Send map load
+                send(
+                    Gson().toJson(
+                        mapOf(
+                            CommConstants.COMMAND to LOAD_TEST_MAP_COMMAND,
+                            "filename" to "SampleArena1",
+                        )
+                    )
+                )
+                receiveMsgAndLog()
+
+                // Send reset and start exploration
                 send("/force_reset")
                 send("/force_start_exploration")
-
                 // Receive frame.
-                when (val frame = incoming.receive()) {
-                    is Frame.Text -> {
-                        val reply = frame.readText()
-                        logger.info { reply }
-                    }
-//                    is Frame.Binary -> println(frame.readBytes())
-                }
+                receiveMsgAndLog()
 
-                val run = Exploration(this, START_ROW, START_COL )
+                val run = Exploration(this, START_ROW, START_COL)
                 run.startCalibration()
                 run.explorationLoop()
                 client.close()
             }
+        }
+    }
+
+    private suspend fun receiveMsgAndLog() {
+        when (val frame = session.incoming.receive()) {
+            is Frame.Text -> {
+                val reply = frame.readText()
+                logger.info { reply }
+            }
+//                    is Frame.Binary -> println(frame.readBytes())
         }
     }
 
@@ -66,8 +82,8 @@ class ExplorationIntegrationTest {
         private val commSession: WebSocketSession,
         private val startRow: Int,
         private val startCol: Int,
-        private val coverageLimit: Int = 100,
-        timeLimit: Long = 60 * 5,
+        private val coverageLimit: Int = DEFAULT_MAP_SIZE,
+        timeLimit: Long = 60,
     ) {
 
         private val bot: Robot = Robot(startRow, startCol)
@@ -93,10 +109,7 @@ class ExplorationIntegrationTest {
                         break
                     }
                 }
-                counter+=1
-                if(counter>10) {
-                    break
-                }
+                counter += 1
             } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime)
 //        goHome()
         }
@@ -114,7 +127,13 @@ class ExplorationIntegrationTest {
         }
 
         private fun nextMove() {
-            logger.debug { " ${lookFree(RobotConstants.DIRECTION.getNext(bot.robotDir))} ${lookFree(bot.robotDir)} ${lookFree(RobotConstants.DIRECTION.getPrev(bot.robotDir))}"}
+            logger.debug {
+                " ${lookFree(RobotConstants.DIRECTION.getNext(bot.robotDir))} ${lookFree(bot.robotDir)} ${
+                    lookFree(
+                        RobotConstants.DIRECTION.getPrev(bot.robotDir)
+                    )
+                }"
+            }
 
             when {
                 lookFree(RobotConstants.DIRECTION.getNext(bot.robotDir)) -> {
@@ -129,7 +148,7 @@ class ExplorationIntegrationTest {
                     if (lookFree(bot.robotDir)) moveBot(RobotConstants.MOVEMENT.FORWARD)
                 }
                 else -> {
-                    logger.debug{ "Turning around! "}
+                    logger.debug { "Turning around! " }
                     // Turn around
                     moveBot(RobotConstants.MOVEMENT.RIGHT)
                     moveBot(RobotConstants.MOVEMENT.RIGHT)
@@ -138,13 +157,13 @@ class ExplorationIntegrationTest {
         }
 
         private fun moveBot(m: RobotConstants.MOVEMENT) {
-            val movementCommand:String = when(m){
+            val movementCommand: String = when (m) {
                 RobotConstants.MOVEMENT.FORWARD -> CommConstants.FORWARD_COMMAND
                 RobotConstants.MOVEMENT.BACKWARD -> CommConstants.BACKWARD_COMMAND
                 RobotConstants.MOVEMENT.RIGHT -> CommConstants.RIGHT_COMMAND
                 RobotConstants.MOVEMENT.LEFT -> CommConstants.LEFT_COMMAND
             }
-            logger.debug{ "Sending command $movementCommand"}
+            logger.debug { "Sending command $movementCommand" }
             val payload = Gson().toJson(
                 mapOf(
                     CommConstants.COMMAND to movementCommand,
@@ -155,7 +174,7 @@ class ExplorationIntegrationTest {
             bot.move(m)
             runBlocking {
                 commSession.send(Frame.Text(payload))
-                while(true) {
+                while (true) {
                     when (val frame = commSession.incoming.receive()) {
                         is Frame.Text -> {
                             val reply = frame.readText()
@@ -164,15 +183,14 @@ class ExplorationIntegrationTest {
                                 Gson().fromJson(reply, object : TypeToken<HashMap<String, String>>() {}.type)
                             val type = response["update"]
 
-                            if (type!= null && type=="sensor_read") {
+                            if (type != null && type == "sensor_read") {
                                 val sensorId = response.getValue("id")
                                 val sensorValue = response.getValue("value").toInt()
                                 logger.debug {
                                     "Processing $sensorId : $sensorValue"
                                 }
                                 bot.sensorMap[sensorId]!!.processSensorVal(exploredMap, sensorValue)
-                            }
-                            else {
+                            } else {
                                 break;
                             }
                         }
@@ -194,27 +212,27 @@ class ExplorationIntegrationTest {
         }
 
         private fun northFree(): Boolean {
-            return isExploredNotObstacle(bot.row + 2, bot.col - 1) &&
-                    isExploredAndFree(bot.row + 2, bot.col) &&
-                    isExploredNotObstacle(bot.row + 2, bot.col + 1)
+            return isExploredNotObstacle(bot.row + 1, bot.col - 1) &&
+                    isExploredAndFree(bot.row + 1, bot.col) &&
+                    isExploredNotObstacle(bot.row + 1, bot.col + 1)
         }
 
         private fun eastFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 1, bot.col + 2) &&
-                    isExploredAndFree(bot.row, bot.col + 2) &&
-                    isExploredNotObstacle(bot.row + 1, bot.col + 2)
+            return isExploredNotObstacle(bot.row - 1, bot.col + 1) &&
+                    isExploredAndFree(bot.row, bot.col + 1) &&
+                    isExploredNotObstacle(bot.row + 1, bot.col + 1)
         }
 
         private fun southFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 2, bot.col - 1) &&
-                    isExploredAndFree(bot.row - 2, bot.col) &&
-                    isExploredNotObstacle(bot.row - 2, bot.col + 1)
+            return isExploredNotObstacle(bot.row - 1, bot.col - 1) &&
+                    isExploredAndFree(bot.row - 1, bot.col) &&
+                    isExploredNotObstacle(bot.row - 1, bot.col + 1)
         }
 
         private fun westFree(): Boolean {
-            return isExploredNotObstacle(bot.row - 1, bot.col - 2) &&
-                    isExploredAndFree(bot.row, bot.col - 2) &&
-                    isExploredNotObstacle(bot.row + 1, bot.col - 2)
+            return isExploredNotObstacle(bot.row - 1, bot.col - 1) &&
+                    isExploredAndFree(bot.row, bot.col - 1) &&
+                    isExploredNotObstacle(bot.row + 1, bot.col - 1)
         }
 
 

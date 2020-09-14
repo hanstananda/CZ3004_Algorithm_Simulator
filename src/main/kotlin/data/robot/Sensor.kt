@@ -41,11 +41,11 @@ data class Sensor(
             val rPos = this.row + ySee[dir.ordinal] * i
             val cPos = this.col + xSee[dir.ordinal] * i
             if (!realMap.checkValidCoordinates(rPos, cPos)) {
-                lastReading = i
+                lastReading = 0
                 break
             }
             if (realMap.grid[rPos][cPos].obstacle) {
-                lastReading = i
+                lastReading = 0
                 break
             }
         }

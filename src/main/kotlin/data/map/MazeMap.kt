@@ -1,12 +1,6 @@
 package data.map
 
 import constants.MapConstants
-import constants.GraphicsConstants
-import constants.RobotConstants
-import data.robot.Robot
-import java.awt.Color
-import java.awt.Graphics
-import javax.swing.JPanel
 
 // Note: Can consider removing the `data` in this class,
 // as most data access are from method calls
@@ -17,44 +11,49 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
     private val yMove = intArrayOf(-1,0,1)
 
     init {
-        for (row in 0 until rowSize) {
-            for (col in 0 until colSize) {
-                // Set the virtual walls of the maze
-                if (row == 0 || row == rowSize - 1 ||
-                    col == 0 || col == colSize - 1
-                ) {
-                    grid[row][col].virtualWall = true
-                }
-            }
-        }
+        resetAllObstacle()
+        initExploredAreas()
     }
 
     fun reset() {
         resetAllObstacle()
-        setAllUnexplored()
+        initExploredAreas()
     }
 
     private fun resetAllObstacle() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].obstacle = false;
-                grid[row][col].virtualWall = false;
+                grid[row][col].obstacle = false
+                // Set maze edges virtual wall to true, and the rest false
+                grid[row][col].virtualWall = isVirtualMazeWall(row, col)
             }
         }
+
     }
 
-    fun setAllUnexplored() {
+    private fun isVirtualMazeWall(row: Int, col: Int):Boolean {
+        if (row == 0 || row == rowSize - 1 ||
+            col == 0 || col == colSize - 1
+        ) {
+            return true
+        }
+        return false
+    }
+
+    fun initExploredAreas() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].explored = false;
+                // Set start and goal explored areas to true, and the rest false
+                grid[row][col].explored = inGoalZone(row, col) || inStartZone(row, col)
             }
         }
+
     }
 
     fun setAllExplored() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].explored = true;
+                grid[row][col].explored = true
             }
         }
     }
@@ -69,8 +68,11 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
                 val rowT = row + y
                 val colT = col + x
                 if(checkValidCoordinates(rowT, colT)) {
-                    //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
-                    grid[rowT][colT].virtualWall = obstacle
+                    if(!isVirtualMazeWall(rowT, colT)) {
+                        //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
+                        grid[rowT][colT].virtualWall = obstacle
+                    }
+
                 }
             }
         }

@@ -6,18 +6,18 @@ import constants.CommConstants.BACKWARD_COMMAND
 import constants.CommConstants.COMMAND
 import constants.CommConstants.EXPLORATION_START_COMMAND
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
+import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.LEFT_COMMAND
+import constants.CommConstants.LOAD_TEST_MAP_COMMAND
 import constants.CommConstants.MOVEMENT_COMMAND
-import constants.CommConstants.MOVING_STATUS
 import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.STOP_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
-import constants.CommConstants.UNSUPPORTED_COMMAND_ERROR
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
@@ -47,7 +47,7 @@ class SimulatorServer {
         Simulator.displayMainFrame()
     }
 
-    suspend fun updateSimulation() {
+    fun updateSimulation() {
         Simulator.updateSimulatorMap(SimulatorMap(mazeMap, robot))
     }
 
@@ -109,7 +109,7 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun generateRandomMap() {
+    fun generateRandomMap() {
         mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
     }
 
@@ -173,6 +173,11 @@ class SimulatorServer {
             }
             commandType.startsWith(OBSTACLE_DETECT_COMMAND) -> {
                 response = Gson().toJson(STOP_STATUS)
+            }
+            commandType.startsWith(LOAD_TEST_MAP_COMMAND) -> {
+                val filename = request["filename"] ?: "TestMap1"
+                loadMapFromDisk(mazeMap, filename)
+                response = Gson().toJson(FINISHED_COMMAND)
             }
             else -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
