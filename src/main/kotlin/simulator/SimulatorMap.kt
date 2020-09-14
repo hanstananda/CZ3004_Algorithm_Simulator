@@ -32,8 +32,8 @@ class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
                     when {
                         map.inStartZone(mapRow, mapCol) -> GraphicsConstants.START_CELL
                         map.inGoalZone(mapRow, mapCol) -> GraphicsConstants.GOAL_CELL
-                        !map.grid[mapRow][mapCol].explored -> GraphicsConstants.UNEXPLORED_CELL
                         map.grid[mapRow][mapCol].obstacle -> GraphicsConstants.OBSTACLE_CELL
+                        !map.grid[mapRow][mapCol].explored -> GraphicsConstants.UNEXPLORED_CELL
                         else -> GraphicsConstants.FREE_CELL
                     }
                 g.color = cellColor

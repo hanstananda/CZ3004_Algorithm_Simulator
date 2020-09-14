@@ -34,7 +34,7 @@ data class Sensor(
      * -1 if no obstacle is detected.
      */
     fun simulateSense(exploredMap: MazeMap, realMap: MazeMap): Int {
-        logger.debug { "Sensor $id now located at ${dir.print()} ${ySee[dir.ordinal]} ${xSee[dir.ordinal]} simulating sense" }
+        logger.trace { "Sensor $id now located at ${dir.print()} ${ySee[dir.ordinal]} ${xSee[dir.ordinal]} simulating sense" }
         lastReading = -1
         // Check if starting point is valid for sensors with lowerRange > 1.
         for (i in 1 until lowerRange) {

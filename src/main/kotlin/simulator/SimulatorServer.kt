@@ -37,10 +37,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 class SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
-    var mazeMap = MazeMap()
-    var exploredMap = MazeMap()
-    val robot = Robot(START_ROW, START_COL)
     lateinit var latestMember: String
+
+    companion object {
+        var mazeMap = MazeMap()
+        var exploredMap = MazeMap()
+        val robot = Robot(START_ROW, START_COL)
+    }
 
     init {
         loadMapFromDisk(mazeMap, "TestMap1")
@@ -203,6 +206,7 @@ class SimulatorServer {
                     "value" to result.value
                 )
             )
+            logger.debug { response }
             members[sender]?.send(Frame.Text(response))
         }
     }
