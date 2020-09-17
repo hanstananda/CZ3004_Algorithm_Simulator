@@ -12,6 +12,8 @@ object RobotConstants {
     const val SENSOR_LONG_RANGE_H = 5
     val START_DIR = DIRECTION.NORTH
     const val DELAY = 100
+    val FRONT_SENSOR_IDS = setOf("IRS_FL", "IRS_FM", "IRS_FR")
+
 
     enum class DIRECTION {
         // Note: The current implementation is tedious, yet is the most efficient. More discussion needed

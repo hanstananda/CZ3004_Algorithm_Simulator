@@ -4,74 +4,79 @@ import constants.MapConstants
 import data.robot.Robot
 import javax.swing.JPanel
 
+
 // Note: Can consider removing the `data` in this class,
 // as most data access are from method calls
 
-data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize: Int = MapConstants.DEFAULT_COL_SIZE) : JPanel() {
-    var grid: Array<Array<Cell>> = Array(rowSize) { i -> Array(colSize) { j -> Cell(i, j)} }
 
-    // possibleGridLabels - 0 = unexplored, 1 = explored, 2 = obstacle, 3 = way point, 4 = start point and 5 = end point
-    // Note that grid is by x, y coordinate and this is opposite of the Array position in Java
-    private val dist = Array(rowSize) { DoubleArray(colSize) }
-    private var bot: Robot = Robot(1,1)
+data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize: Int = MapConstants.DEFAULT_COL_SIZE) {
+    var grid: Array<Array<Cell>> = Array(rowSize) { i -> Array(colSize) { j -> Cell(i, j)} }
     private val xMove = intArrayOf(-1,0,1)
     private val yMove = intArrayOf(-1,0,1)
 
     init {
-        for (row in 0 until rowSize) {
-            for (col in 0 until colSize) {
-                // Set the virtual walls of the maze
-                if (row == 0 || row == rowSize - 1 ||
-                    col == 0 || col == colSize - 1
-                ) {
-                    grid[row][col].virtualWall = true
-                }
-            }
-        }
+        resetAllObstacle()
+        initExploredAreas()
     }
 
     fun reset() {
         resetAllObstacle()
-        setAllUnexplored()
+        initExploredAreas()
     }
 
-    fun resetAllObstacle() {
+    private fun resetAllObstacle() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].obstacle = false;
-                grid[row][col].virtualWall = false;
+                grid[row][col].obstacle = false
+                // Set maze edges virtual wall to true, and the rest false
+                grid[row][col].virtualWall = isVirtualMazeWall(row, col)
             }
         }
+
     }
 
-    fun setAllUnexplored() {
+    private fun isVirtualMazeWall(row: Int, col: Int):Boolean {
+        if (row == 0 || row == rowSize - 1 ||
+            col == 0 || col == colSize - 1
+        ) {
+            return true
+        }
+        return false
+    }
+
+    fun initExploredAreas() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].explored = false;
+                // Set start and goal explored areas to true, and the rest false
+                grid[row][col].explored = inGoalZone(row, col) || inStartZone(row, col)
             }
         }
+
     }
 
     fun setAllExplored() {
         for (row in 0 until rowSize) {
             for (col in 0 until colSize) {
-                grid[row][col].explored = true;
+                grid[row][col].explored = true
             }
         }
     }
 
-    fun setObstacle(row: Int, col: Int) {
+    fun setObstacle(row: Int, col: Int, obstacle: Boolean) {
         if (inStartZone(row, col) || inGoalZone(row, col)) {
             return
         }
-        grid[row][col].obstacle = true
+        grid[row][col].obstacle = obstacle
         for(x in xMove) {
             for (y in yMove) {
                 val rowT = row + y
                 val colT = col + x
                 if(checkValidCoordinates(rowT, colT)) {
-                    //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
-                    grid[rowT][colT].virtualWall = true;
+                    if(!isVirtualMazeWall(rowT, colT)) {
+                        //TODO: When removing virtual walls, must also check whether nearby still have active obstacle and decide accordingly
+                        grid[rowT][colT].virtualWall = obstacle
+                    }
+
                 }
             }
         }
@@ -119,13 +124,6 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
      */
     fun inGoalZone(row: Int, col: Int): Boolean {
         return row in rowSize - 3 until rowSize && col in colSize - 3 until colSize
-    }
-
-    // Set the distance of which the grid label is set
-    fun setDist(x: Int, y: Int, value: Double) {
-        if (x in 0 until rowSize && y in 0 until colSize) {
-            dist[x][y] = value
-        }
     }
 
 }

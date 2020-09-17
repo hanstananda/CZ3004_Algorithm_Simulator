@@ -1,18 +1,12 @@
-import data.map.MazeMap
+import io.ktor.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import mu.KotlinLogging
-import utils.map.RandomMapGenerator
-import utils.map.debugMap
-import utils.map.loadMapFromDisk
 
+// connect to ws://localhost:8080/robot
 
-fun main() {
+fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}
-    logger.info {"Test start main!"}
-//    val testMapDescriptor = MapDescriptor()
-    var mazeMap = MazeMap()
-    loadMapFromDisk(mazeMap, "/TestMap1.txt")
-    debugMap(mazeMap)
-    mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
-    debugMap(mazeMap)
-
+    embeddedServer(Netty, commandLineEnvironment(args)).start()
+    logger.info {"Application server successfully started!"}
 }

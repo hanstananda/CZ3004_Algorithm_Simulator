@@ -8,11 +8,13 @@ import kotlin.math.abs
 
 fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
     try {
-        object {}.javaClass.getResourceAsStream("/$fileName.txt").bufferedReader().useLines { it ->
+
+        mazeMap.reset()
+        object {}.javaClass.getResourceAsStream("/mazemaps/$fileName.txt").bufferedReader().useLines { it ->
             it.forEachIndexed  { row, line ->
                 for(col in 0 until mazeMap.colSize) {
                     if(line[col] == '1') {
-                        mazeMap.setObstacle(mazeMap.rowSize-1-row, col)
+                        mazeMap.setObstacle(mazeMap.rowSize-1-row, col, true)
                     }
                 }
             }

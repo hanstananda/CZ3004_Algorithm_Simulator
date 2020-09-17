@@ -17,7 +17,7 @@ class RandomMapGenerator {
             for (row in 0 until mazeMap.rowSize) {
                 for (col in 0 until mazeMap.colSize) {
                     if (Random.nextInt(100) < wallPercentage) {
-                        mazeMap.setObstacle(row, col)
+                        mazeMap.setObstacle(row, col, true)
                     }
                 }
             }

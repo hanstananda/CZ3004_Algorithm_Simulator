@@ -2,7 +2,7 @@ package constants
 
 import java.awt.Color
 
-internal object GraphicsConstants {
+object GraphicsConstants {
     const val CELL_LINE_WEIGHT = 2
     val START_CELL = Color.BLUE
     val GOAL_CELL = Color.GREEN
