@@ -157,6 +157,28 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         }
     }
 
+    private fun checkValidX(x: Int): Int {
+        var x = x
+        if (x >= MapConstants.DEFAULT_ROW_SIZE - 1) {
+            x = MapConstants.DEFAULT_ROW_SIZE - 2
+        }
+        if (x <= 0) {
+            x = 1
+        }
+        return x
+    }
+
+    private fun checkValidY(y: Int): Int {
+        var y = y
+        if (y >= MapConstants.DEFAULT_COL_SIZE - 1) {
+            y = MapConstants.DEFAULT_COL_SIZE - 2
+        }
+        if (y <= 0) {
+            y = 1
+        }
+        return y
+    }
+
     override fun paintComponent(g: Graphics) {
         // Paint the robot on-screen.
         g.color = GraphicsConstants.ROBOT_CELL

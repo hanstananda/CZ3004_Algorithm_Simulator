@@ -13,10 +13,10 @@ import javax.swing.*
 
 
 private var f: JFrame? = null
-private var m: JPanel? = null
+var m: JPanel? = null
 private var b: JPanel? = null
 
-private var sim: SimulatorMap? = null
+var sim: SimulatorMap? = null
 
 private val realRun = false
 
@@ -31,8 +31,8 @@ fun main(args: Array<String>) {
 private fun displayMainFrame() {
 
     //initialise main frame
-    f = JFrame("MDP Simulator")
-    f!!.size = Dimension(690, 700)
+    f = JFrame("Group 28 MDP Simulator")
+    f!!.size = Dimension(1500, 1000)
     f!!.isResizable = false
     f!!.isFocusable = true
     f!!.focusTraversalKeysEnabled = false;
@@ -47,12 +47,13 @@ private fun displayMainFrame() {
     //create JPanel for buttons
     b = JPanel()
 
+    initButtons()
+
     //add m & b to the main frame's content pane
     val contentPane = f!!.contentPane
     contentPane.add(m, BorderLayout.CENTER)
-    contentPane.add(b, BorderLayout.PAGE_END)
+//    contentPane.add(b, BorderLayout.PAGE_END)
     initMain()
-    initButtons()
 
     // movement buttons to move robot
     initMovementButtons()
@@ -65,12 +66,15 @@ private fun initMain() {
     m?.add(sim, "MAP")
     val cl = m!!.layout as CardLayout
     cl.show(m, "MAP")
+    m?.setLocation(500,500)
 
 }
 
 private fun initButtons() {
-    b!!.layout = GridLayout()
-    addButtons()
+//    b!!.layout = GridLayout()
+//    addButtons()
+    // add the buttons onto the frame
+    var buttonListener = f?.let { AddJButtonActionListener(it) }
 }
 
 private fun formatButton(btn: JButton) {
