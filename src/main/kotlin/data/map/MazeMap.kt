@@ -90,12 +90,6 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
         grid[row][col].waypoint = true
     }
 
-    fun getGrid(x: Int, y: Int): String? {
-        // If the x, y is outside the board, it returns an obstacle.
-        return if (x < 0 || x >= rowSize || y < 0 || y >= colSize) {
-            MapConstants.POSSIBLEGRIDLABELS[2]
-        } else grid[x][y].toString()
-    }
 
     /**
      * Returns true if the row and column values are valid.
