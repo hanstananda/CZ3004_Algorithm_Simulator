@@ -155,6 +155,8 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
     }
 
     fun move(m: RobotConstants.MOVEMENT) {
+        row = checkValidRow(row)
+        col = checkValidCol(col)
         // Emulate real movement by pausing execution.
         try {
             TimeUnit.MILLISECONDS.sleep(delay.toLong())
@@ -180,6 +182,8 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         }
         logger.debug { "Current robot is located at ($row,$col) facing ${robotDir.print()}" }
         updateSensorPos()
+        row = checkValidRow(row)
+        col = checkValidCol(col)
     }
 
     private fun findNewDirection(m: RobotConstants.MOVEMENT): RobotConstants.DIRECTION {
@@ -190,9 +194,9 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         }
     }
 
-    private fun checkValidX(x: Int): Int {
+    private fun checkValidRow(x: Int): Int {
         var x = x
-        if (x >= MapConstants.DEFAULT_ROW_SIZE - 1) {
+        if (x >= MapConstants.DEFAULT_ROW_SIZE - 2) {
             x = MapConstants.DEFAULT_ROW_SIZE - 2
         }
         if (x <= 0) {
@@ -201,9 +205,9 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         return x
     }
 
-    private fun checkValidY(y: Int): Int {
+    private fun checkValidCol(y: Int): Int {
         var y = y
-        if (y >= MapConstants.DEFAULT_COL_SIZE - 1) {
+        if (y >= MapConstants.DEFAULT_COL_SIZE - 2) {
             y = MapConstants.DEFAULT_COL_SIZE - 2
         }
         if (y <= 0) {

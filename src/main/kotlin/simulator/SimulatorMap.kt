@@ -10,7 +10,7 @@ import java.awt.Graphics
 import javax.swing.JPanel
 
 
-class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
+class SimulatorMap(var map: MazeMap, val bot: Robot) : JPanel() {
     override fun paintComponent(g: Graphics) {
         // Create an array of displayCell objects for rendering.
         val mapCells = Array(map.rowSize) { mapRow ->
