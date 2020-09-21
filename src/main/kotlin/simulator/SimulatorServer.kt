@@ -38,13 +38,12 @@ object SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
     lateinit var latestMember: String
-    var mazeMap = MazeMap()
+    var trueMap = MazeMap()
     var exploredMap = MazeMap()
     val robot = Robot(START_ROW, START_COL)
 
     init {
-        loadMapFromDisk(mazeMap, "TestMap1")
-        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
+        resetMapAndRobot()
         Simulator.displayMainFrame()
     }
 
@@ -52,7 +51,7 @@ object SimulatorServer {
 //        if (logger.isDebugEnabled) {
 //            debugMap(mazeMap = exploredMap, robot = robot)
 //        }
-        Simulator.updateSimulatorMap(SimulatorMap(mazeMap, robot))
+        Simulator.updateSimulatorMap(SimulatorMap(trueMap, robot))
     }
 
     suspend fun help(sender: String) {
@@ -114,7 +113,7 @@ object SimulatorServer {
     }
 
     fun generateRandomMap() {
-        mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
+        trueMap = RandomMapGenerator.createValidatedRandomMazeMap()
         updateSimulation()
     }
 
@@ -181,7 +180,7 @@ object SimulatorServer {
             }
             commandType.startsWith(LOAD_TEST_MAP_COMMAND) -> {
                 val filename = request["filename"] ?: "TestMap1"
-                loadMapFromDisk(mazeMap, filename)
+                loadMapFromDisk(trueMap, filename)
                 response = Gson().toJson(FINISHED_COMMAND)
             }
             else -> {
@@ -194,7 +193,7 @@ object SimulatorServer {
 
 
     private suspend fun sendSensorTelemetry(sender: String) {
-        val sensorReadings = robot.getSensorReadings(exploredMap, mazeMap)
+        val sensorReadings = robot.getSensorReadings(exploredMap, trueMap)
         for (result in sensorReadings) {
             val response = Gson().toJson(
                 mapOf(
@@ -231,11 +230,17 @@ object SimulatorServer {
     }
 
     fun resetRobot() {
-        exploredMap = MazeMap()
-        loadMapFromDisk(mazeMap, "TestMap1")
-        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
-        robot.resetRobot()
+        resetMapAndRobot()
         updateSimulation()
+    }
+
+    private fun resetMapAndRobot() {
+        exploredMap = MazeMap()
+        loadMapFromDisk(trueMap, "TestMap1")
+        trueMap.setAllExplored()
+        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(trueMap, robot))
+        robot.resetRobot()
+        robot.simulateSensors(exploredMap, trueMap)
     }
 
 }
