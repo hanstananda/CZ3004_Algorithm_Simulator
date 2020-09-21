@@ -12,7 +12,7 @@ import utils.map.loadMapFromDisk
 
 class RobotRunTests {
     private val testMap: MazeMap = MazeMap()
-    private val filename = "TestMap1"
+    private val filename = "TestMap2"
     private val logger = KotlinLogging.logger {}
 
     @Test
@@ -102,7 +102,7 @@ class RobotRunTests {
         }
 
         @Test
-        fun `check front sensor simulation in robot working`() {
+        fun `check front sensor simulation in facing north robot working`() {
             val obstacleRow = 8
             val obstacleColFr = 5
             val obstacleColTo = 7
@@ -126,6 +126,88 @@ class RobotRunTests {
             Assertions.assertEquals(-1, ans3[2])
 
         }
+
+        @Test
+        fun `check front sensor simulation in facing south robot working`() {
+            val obstacleRow = 8
+            val obstacleColFr = 5
+            val obstacleColTo = 7
+
+            robot.setRobotPosAndDir(obstacleRow + 2, obstacleColFr, RobotConstants.DIRECTION.SOUTH)
+            val ans1 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans1[0])
+            Assertions.assertEquals(1, ans1[1])
+            Assertions.assertEquals(-1, ans1[2])
+
+            robot.setRobotPos(obstacleRow + 2, obstacleColFr + 1)
+            val ans2 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans2[0])
+            Assertions.assertEquals(1, ans2[1])
+            Assertions.assertEquals(1, ans2[2])
+
+            robot.setRobotPos(obstacleRow + 2, obstacleColTo)
+            val ans3 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(-1, ans3[0])
+            Assertions.assertEquals(1, ans3[1])
+            Assertions.assertEquals(1, ans3[2])
+
+        }
+
+        @Test
+        fun `check front sensor simulation in facing east robot working`() {
+            val obstacleRowFr = 1
+            val obstacleRowTo = 3
+            val obstacleCol = 7
+
+            robot.setRobotPosAndDir(obstacleRowFr, obstacleCol - 2, RobotConstants.DIRECTION.EAST)
+            val ans1 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans1[0])
+            Assertions.assertEquals(1, ans1[1])
+            Assertions.assertEquals(-1, ans1[2])
+
+            robot.setRobotPos(obstacleRowFr +1, obstacleCol - 2)
+            val ans2 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans2[0])
+            Assertions.assertEquals(1, ans2[1])
+            Assertions.assertEquals(1, ans2[2])
+
+            robot.setRobotPos(obstacleRowTo , obstacleCol - 2)
+            val ans3 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(-1, ans3[0])
+            Assertions.assertEquals(1, ans3[1])
+            Assertions.assertEquals(1, ans3[2])
+
+        }
+
+        @Test
+        fun `check front sensor simulation in facing west robot working`() {
+            val obstacleRowFr = 1
+            val obstacleRowTo = 3
+            val obstacleCol = 7
+
+            robot.setRobotPosAndDir(obstacleRowFr, obstacleCol + 2, RobotConstants.DIRECTION.WEST)
+            val ans1 = robot.simulateSensors(exploredMap, testMap)
+
+            Assertions.assertEquals(-1, ans1[0])
+            Assertions.assertEquals(1, ans1[1])
+            Assertions.assertEquals(1, ans1[2])
+
+            robot.setRobotPos(obstacleRowFr +1, obstacleCol + 2)
+            val ans2 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans2[0])
+            Assertions.assertEquals(1, ans2[1])
+            Assertions.assertEquals(1, ans2[2])
+
+            robot.setRobotPos(obstacleRowTo , obstacleCol + 2)
+            val ans3 = robot.simulateSensors(exploredMap, testMap)
+            Assertions.assertEquals(1, ans3[0])
+            Assertions.assertEquals(1, ans3[1])
+            Assertions.assertEquals(-1, ans3[2])
+
+        }
+
+
+
 
         @Test
         fun `sensing and rotating robot front sensor consistency check`() {
