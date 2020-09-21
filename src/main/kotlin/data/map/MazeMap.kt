@@ -51,7 +51,6 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
                 grid[row][col].explored = inGoalZone(row, col) || inStartZone(row, col)
             }
         }
-
     }
 
     fun setAllExplored() {

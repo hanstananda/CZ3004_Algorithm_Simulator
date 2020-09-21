@@ -15,6 +15,7 @@ import java.util.*
 import javax.swing.*
 import kotlin.collections.HashMap
 
+
 object Simulator: ActionListener {
 
     lateinit var f: JFrame
@@ -49,7 +50,7 @@ object Simulator: ActionListener {
     fun displayMainFrame() {
         //initialise main frame
         f = JFrame("MDP Simulator")
-        f.size = Dimension(700, 800)
+        f.size = Dimension(700, 820)
         f.isResizable = false
         f.isFocusable = true
         f.focusTraversalKeysEnabled = false;
@@ -85,45 +86,11 @@ object Simulator: ActionListener {
     }
 
     private fun initButtons() {
-        b.layout = GridLayout(3,3)
+        b.layout = GridLayout(4,3)
         addButtons()
     }
 
-    private fun formatButton(btn: JButton) {
-        btn.font = Font("Arial", Font.BOLD, 13)
-        btn.isFocusPainted = false
-    }
-
     private fun addButtons() {
-        // Exploration Button
-        val exploreButton = JButton("Exploration")
-        exploreButton.isFocusable = false
-        exploreButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-            }
-        })
-        b!!.add(exploreButton)
-
-        // Fastest Path Button
-        val fastestPathButton = JButton("Fastest Path")
-        fastestPathButton.isFocusable = false
-        fastestPathButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-            }
-        })
-        b!!.add(fastestPathButton)
-
-        // Reset Robot Button
-        val resetButton = JButton("Reset Robot")
-        resetButton.isFocusable = false
-        resetButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                sim.bot.resetRobot()
-                updateSimulatorMap()
-            }
-        })
-        b!!.add(resetButton)
-
         // Load Map Button
         val loadMapPanel = JPanel()
         val loadMapLabel = JLabel("Load Map:")
@@ -135,6 +102,41 @@ object Simulator: ActionListener {
         loadMapPanel.add(loadMapLabel)
         loadMapPanel.add(loadMapButton)
         b.add(loadMapPanel)
+
+        // Show True Map Button
+        val showTrueMapButton = JButton("Show True Map")
+        showTrueMapButton.isFocusable = false
+        showTrueMapButton.actionCommand = "Show True Map"
+        showTrueMapButton.addActionListener(this)
+        b.add(showTrueMapButton)
+
+        // Show Explored Map Button
+        val showExploredMapButton = JButton("Show Explored Map")
+        showExploredMapButton.isFocusable = false
+        showExploredMapButton.actionCommand = "Show Explored Map"
+        showExploredMapButton.addActionListener(this)
+        b.add(showExploredMapButton)
+
+        // Exploration Button
+        val exploreButton = JButton("Exploration")
+        exploreButton.isFocusable = false
+        exploreButton.actionCommand = "Exploration"
+        exploreButton.addActionListener(this)
+        b.add(exploreButton)
+
+        // Fastest Path Button
+        val fastestPathButton = JButton("Fastest Path")
+        fastestPathButton.isFocusable = false
+        fastestPathButton.actionCommand = "Fastest Path"
+        fastestPathButton.addActionListener(this)
+        b.add(fastestPathButton)
+
+        // Reset Robot Button
+        val resetButton = JButton("Reset Robot")
+        resetButton.isFocusable = false
+        resetButton.actionCommand = "Reset Robot"
+        resetButton.addActionListener(this)
+        b.add(resetButton)
 
         // Set Time Limit Button
         val timePanel = JPanel()
@@ -221,7 +223,7 @@ object Simulator: ActionListener {
     // reads all txt files from the resources directory and returns the array of file names
     private fun getMapFileNames(): Array<String?> {
         val folder = File("./src/main/resources/mazemaps")
-        var filePath = HashMap<String, String>()
+        val filePath = HashMap<String, String>()
         for (file in folder.listFiles()) {
             if (file.name.endsWith(".txt")) {
                 filePath[file.name.substring(0, file.name.lastIndexOf(".txt"))] = file.absolutePath
@@ -269,6 +271,23 @@ object Simulator: ActionListener {
                 logger.debug{eX.message}
             }
         }
+        if (action.contentEquals("Show True Map")){
+            sim.map.setAllExplored()
+            updateSimulatorMap()
+        }
+        if (action.contentEquals("Show Explored Map")){
+            //TODO
+        }
+        if (action.contentEquals("Exploration")){
+            //TODO
+        }
+        if (action.contentEquals("Fastest Path")){
+            //TODO
+        }
+        if (action.contentEquals("Reset Robot")){
+            sim.bot.resetRobot()
+            updateSimulatorMap()
+        }
         if (action.contentEquals("Set time limit")){
             val secs = e.source as JComboBox<*>
             val secsChosen = secs.selectedItem as String
@@ -283,6 +302,7 @@ object Simulator: ActionListener {
             val s = e.source as JComboBox<*>
             val sp = s.selectedItem as String
             speed_chosen = sp.toInt()
+            sim.bot.speed = speed_chosen
         }
         if (action.contentEquals("Set Waypoint Row")){
             val waypointRow = e.source as JComboBox<*>

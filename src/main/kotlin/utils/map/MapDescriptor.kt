@@ -8,7 +8,6 @@ import kotlin.math.abs
 
 fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
     try {
-
         mazeMap.reset()
         object {}.javaClass.getResourceAsStream("/mazemaps/$fileName.txt").bufferedReader().useLines { it ->
             it.forEachIndexed  { row, line ->
@@ -18,13 +17,11 @@ fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
                     }
                 }
             }
-            mazeMap.setAllExplored()
-
+            mazeMap.initExploredAreas()
         }
     } catch (e: NullPointerException) {
         e.printStackTrace()
     }
-
 }
 
 fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {

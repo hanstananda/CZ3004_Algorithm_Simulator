@@ -39,6 +39,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
     var delay: Int = RobotConstants.DELAY
     var row: Int = startRow
     var col: Int = startCol
+    var speed: Int = 1
     private val logger = KotlinLogging.logger {}
 
     private val sensors: Array<Sensor> = arrayOf(
