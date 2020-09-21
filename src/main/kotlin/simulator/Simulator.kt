@@ -7,10 +7,7 @@ import data.robot.Robot
 import mu.KotlinLogging
 import utils.map.loadMapFromDisk
 import java.awt.*
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.event.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -18,7 +15,7 @@ import java.util.*
 import javax.swing.*
 import kotlin.collections.HashMap
 
-object Simulator {
+object Simulator: ActionListener {
 
     lateinit var f: JFrame
     lateinit var m: JPanel
@@ -133,30 +130,8 @@ object Simulator {
         val arr: Array<String?> = getMapFileNames()
         val loadMapButton = JComboBox<String>(arr)
         loadMapButton.isFocusable = false
-        loadMapButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val arenaMap = e.source as JComboBox<String>
-                val selectedFile = arenaMap.selectedItem ?: return
-                val selectedFileString = arenaMap.selectedItem as String
-                try {
-                    val newMap = MazeMap()
-                    loadMapFromDisk(newMap,selectedFileString)
-                    if (newMap != null) {
-                        sim.map = newMap
-                    }
-                    val cl = m!!.layout as CardLayout
-                    cl.show(m, "map")
-                    updateSimulatorMap()
-
-                } catch (f: FileNotFoundException) {
-                    println("File not found")
-                } catch (IO: IOException) {
-                    println("IOException when reading$selectedFile")
-                } catch (eX: Exception) {
-                    println(eX.message)
-                }
-            }
-        })
+        loadMapButton.actionCommand = "Load Map"
+        loadMapButton.addActionListener(this)
         loadMapPanel.add(loadMapLabel)
         loadMapPanel.add(loadMapButton)
         b.add(loadMapPanel)
@@ -167,17 +142,8 @@ object Simulator {
         val timeArr: Array<String?> = createSeqArray(0, 121)
         val timeButton = JComboBox<String>(timeArr)
         timeButton.isFocusable = false
-        timeButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val secs = e.source as JComboBox<String>
-                val secsChosen = secs.selectedItem as String
-                if (secsChosen == null) {
-                    return
-                } else {
-                    time_chosen = secsChosen.toInt()
-                }
-            }
-        })
+        timeButton.actionCommand = "Set time limit"
+        timeButton.addActionListener(this)
         timePanel.add(timeLabel)
         timePanel.add(timeButton)
         b.add(timePanel)
@@ -188,17 +154,8 @@ object Simulator {
         val coverageArr: Array<String?> = createSeqArray(0, 101)
         val coverageButton = JComboBox<String>(coverageArr)
         coverageButton.isFocusable = false
-        coverageButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val percentage = e.source as JComboBox<String>
-                if (percentage == null) {
-                    return
-                } else {
-                    val percentageChosen = percentage.selectedItem as String
-                    percentage_chosen = percentageChosen?.toInt()
-                }
-            }
-        })
+        coverageButton.actionCommand = "Set % limit"
+        coverageButton.addActionListener(this)
         coveragePanel.add(coverageLabel)
         coveragePanel.add(coverageButton)
         b.add(coveragePanel)
@@ -209,15 +166,8 @@ object Simulator {
         val speedArr: Array<String?> = createSeqArray(1,6)
         val speedButton = JComboBox<String>(speedArr)
         speedButton.isFocusable = false
-        speedButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val s = e.source as JComboBox<String>
-                val sp = s.selectedItem as String
-                if (sp != null) {
-                    speed_chosen = sp.toInt()
-                }
-            }
-        })
+        speedButton.actionCommand = "Set speed"
+        speedButton.addActionListener(this)
         speedPanel.add(speedLabel)
         speedPanel.add(speedButton)
         b.add(speedPanel)
@@ -231,28 +181,10 @@ object Simulator {
         val waypointColButton = JComboBox<String>(waypointArrCol)
         waypointRowButton.isFocusable = false
         waypointColButton.isFocusable = false
-        waypointRowButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val waypointRow = e.source as JComboBox<String>
-                val selectedWaypointRow = waypointRow.selectedItem as String
-                if (selectedWaypointRow == null) {
-                    waypoint_chosen[0] = -1
-                } else {
-                    waypoint_chosen[0] = selectedWaypointRow.toInt()
-                }
-            }
-        })
-        waypointColButton.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                val waypointCol = e.source as JComboBox<String>
-                val selectedWaypointCol = waypointCol.selectedItem as String
-                if (selectedWaypointCol == null) {
-                    waypoint_chosen[1] = -1
-                } else {
-                    waypoint_chosen[1] = selectedWaypointCol.toInt()
-                }
-            }
-        })
+        waypointRowButton.actionCommand = "Set Waypoint Row"
+        waypointColButton.actionCommand = "Set Waypoint Col"
+        waypointRowButton.addActionListener(this)
+        waypointColButton.addActionListener(this)
         waypointPanel.add(waypointLabel)
         waypointPanel.add(waypointRowButton)
         waypointPanel.add(waypointColButton)
@@ -313,6 +245,55 @@ object Simulator {
             count++
         }
         return arr
+    }
+
+    override fun actionPerformed(e: ActionEvent?) {
+        val action = e!!.actionCommand
+        if (action!!.contentEquals("Load Map")) {
+            val arenaMap = e.source as JComboBox<*>
+            val selectedFile = arenaMap.selectedItem ?: return
+            val selectedFileString = arenaMap.selectedItem as String
+            try {
+                val newMap = MazeMap()
+                loadMapFromDisk(newMap,selectedFileString)
+                sim.map = newMap
+                val cl = m.layout as CardLayout
+                cl.show(m, "map")
+                updateSimulatorMap()
+
+            } catch (f: FileNotFoundException) {
+                logger.debug{"File not found"}
+            } catch (IO: IOException) {
+                logger.debug{"IOException when reading$selectedFile"}
+            } catch (eX: Exception) {
+                logger.debug{eX.message}
+            }
+        }
+        if (action.contentEquals("Set time limit")){
+            val secs = e.source as JComboBox<*>
+            val secsChosen = secs.selectedItem as String
+            time_chosen = secsChosen.toInt()
+        }
+        if (action.contentEquals("Set % limit")){
+            val percentage = e.source as JComboBox<*>
+            val percentageChosen = percentage.selectedItem as String
+            percentage_chosen = percentageChosen.toInt()
+        }
+        if (action.contentEquals("Set speed")){
+            val s = e.source as JComboBox<*>
+            val sp = s.selectedItem as String
+            speed_chosen = sp.toInt()
+        }
+        if (action.contentEquals("Set Waypoint Row")){
+            val waypointRow = e.source as JComboBox<*>
+            val selectedWaypointRow = waypointRow.selectedItem as String
+            waypoint_chosen[0] = selectedWaypointRow.toInt()
+        }
+        if (action.contentEquals("Set Waypoint Col")){
+            val waypointCol = e.source as JComboBox<*>
+            val selectedWaypointCol = waypointCol.selectedItem as String
+            waypoint_chosen[1] = selectedWaypointCol.toInt()
+        }
     }
 
 }
