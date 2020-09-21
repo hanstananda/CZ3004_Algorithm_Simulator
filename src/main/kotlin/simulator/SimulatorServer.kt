@@ -34,16 +34,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 
-class SimulatorServer {
+object SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
     lateinit var latestMember: String
-
-    companion object {
-        var mazeMap = MazeMap()
-        var exploredMap = MazeMap()
-        val robot = Robot(START_ROW, START_COL)
-    }
+    var mazeMap = MazeMap()
+    var exploredMap = MazeMap()
+    val robot = Robot(START_ROW, START_COL)
 
     init {
         loadMapFromDisk(mazeMap, "TestMap1")
@@ -109,7 +106,7 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startWaypoint(x: Int = START_COL, y: Int = START_ROW) {
+    suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
@@ -209,6 +206,7 @@ class SimulatorServer {
             logger.debug { response }
             members[sender]?.send(Frame.Text(response))
         }
+        debugMap(exploredMap)
     }
 
     /**

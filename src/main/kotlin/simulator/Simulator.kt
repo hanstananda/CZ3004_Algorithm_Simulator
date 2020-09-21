@@ -4,6 +4,7 @@ import constants.MapConstants
 import constants.RobotConstants
 import data.map.MazeMap
 import data.robot.Robot
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import utils.map.loadMapFromDisk
 import java.awt.*
@@ -25,7 +26,7 @@ object Simulator: ActionListener {
 
     lateinit var sim: SimulatorMap
 
-    private val waypoint_chosen = intArrayOf(-1, -1)
+    private var waypoint_chosen = Pair(-1, -1) // In form of (x,y)
     private var time_chosen = -1
     private var percentage_chosen = 100
     private var speed_chosen = 1
@@ -200,14 +201,17 @@ object Simulator: ActionListener {
                 if (e.keyCode == KeyEvent.VK_RIGHT) {
                     logger.debug{ "right button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
                     m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_LEFT) {
                     logger.debug{ "left button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.LEFT)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
                     m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_UP) {
                     logger.debug{ "up button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
                     m.repaint()
                 }
             }
@@ -258,7 +262,9 @@ object Simulator: ActionListener {
             try {
                 val newMap = MazeMap()
                 loadMapFromDisk(newMap,selectedFileString)
-                sim.map = newMap
+                newMap.setAllExplored()
+                SimulatorServer.mazeMap = newMap
+                sim.map= SimulatorServer.mazeMap
                 val cl = m.layout as CardLayout
                 cl.show(m, "map")
                 updateSimulatorMap()
@@ -272,17 +278,22 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Show True Map")){
-            sim.map.setAllExplored()
+            sim.map = SimulatorServer.mazeMap
             updateSimulatorMap()
         }
         if (action.contentEquals("Show Explored Map")){
-            //TODO
+            sim.map = SimulatorServer.exploredMap
+            updateSimulatorMap()
         }
         if (action.contentEquals("Exploration")){
-            //TODO
+            runBlocking {
+                SimulatorServer.startExploration()
+            }
         }
         if (action.contentEquals("Fastest Path")){
-            //TODO
+            runBlocking {
+                SimulatorServer.startFastestPathWithWaypoint(waypoint_chosen.first, waypoint_chosen.second)
+            }
         }
         if (action.contentEquals("Reset Robot")){
             sim.bot.resetRobot()
@@ -307,12 +318,12 @@ object Simulator: ActionListener {
         if (action.contentEquals("Set Waypoint Row")){
             val waypointRow = e.source as JComboBox<*>
             val selectedWaypointRow = waypointRow.selectedItem as String
-            waypoint_chosen[0] = selectedWaypointRow.toInt()
+            waypoint_chosen = Pair(waypoint_chosen.first,selectedWaypointRow.toInt())
         }
         if (action.contentEquals("Set Waypoint Col")){
             val waypointCol = e.source as JComboBox<*>
             val selectedWaypointCol = waypointCol.selectedItem as String
-            waypoint_chosen[1] = selectedWaypointCol.toInt()
+            waypoint_chosen = Pair(selectedWaypointCol.toInt(), waypoint_chosen.second)
         }
     }
 
