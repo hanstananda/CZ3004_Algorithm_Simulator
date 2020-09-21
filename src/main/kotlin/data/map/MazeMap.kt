@@ -1,9 +1,13 @@
 package data.map
 
 import constants.MapConstants
+import data.robot.Robot
+import javax.swing.JPanel
+
 
 // Note: Can consider removing the `data` in this class,
 // as most data access are from method calls
+
 
 data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize: Int = MapConstants.DEFAULT_COL_SIZE) {
     var grid: Array<Array<Cell>> = Array(rowSize) { i -> Array(colSize) { j -> Cell(i, j)} }
@@ -47,7 +51,6 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
                 grid[row][col].explored = inGoalZone(row, col) || inStartZone(row, col)
             }
         }
-
     }
 
     fun setAllExplored() {
@@ -77,6 +80,15 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
             }
         }
     }
+
+    fun setWayPoint(row: Int, col: Int) {
+        if (inStartZone(row, col) || inGoalZone(row, col)) {
+            return
+        }
+        //TODO: error checking for waypoint?
+        grid[row][col].waypoint = true
+    }
+
 
     /**
      * Returns true if the row and column values are valid.

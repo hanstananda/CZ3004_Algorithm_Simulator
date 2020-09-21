@@ -17,11 +17,11 @@ fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
                     }
                 }
             }
+            mazeMap.initExploredAreas()
         }
     } catch (e: NullPointerException) {
         e.printStackTrace()
     }
-
 }
 
 fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {

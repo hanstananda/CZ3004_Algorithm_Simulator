@@ -1,7 +1,6 @@
 package simulator
 
 import constants.GraphicsConstants
-import constants.GraphicsConstants.MAP_X_OFFSET
 import constants.MapConstants
 import constants.RobotConstants
 import data.map.MazeMap
@@ -10,7 +9,8 @@ import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JPanel
 
-class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
+
+class SimulatorMap(var map: MazeMap, val bot: Robot) : JPanel() {
     override fun paintComponent(g: Graphics) {
         // Create an array of displayCell objects for rendering.
         val mapCells = Array(map.rowSize) { mapRow ->
@@ -42,6 +42,7 @@ class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
                     mapCells[mapRow][mapCol].cellY,
                     mapCells[mapRow][mapCol].cellSize,
                     mapCells[mapRow][mapCol].cellSize
+
                 )
             }
         }
@@ -87,9 +88,11 @@ class SimulatorMap(val map: MazeMap, val bot: Robot) : JPanel() {
         }
     }
 
+
     private class DisplayCell(borderX: Int, borderY: Int, borderSize: Int) {
         val cellX: Int = borderX + GraphicsConstants.CELL_LINE_WEIGHT
         val cellY: Int = GraphicsConstants.MAP_H - (borderY - GraphicsConstants.CELL_LINE_WEIGHT)
         val cellSize: Int = borderSize - GraphicsConstants.CELL_LINE_WEIGHT * 2
+
     }
 }

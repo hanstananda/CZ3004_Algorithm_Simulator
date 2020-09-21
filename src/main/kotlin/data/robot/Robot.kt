@@ -4,13 +4,14 @@ import constants.GraphicsConstants
 import constants.MapConstants
 import constants.RobotConstants
 import data.map.MazeMap
+
 import mu.KotlinLogging
-import java.awt.Color
+
 import java.awt.Graphics
 import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
 
-data class Robot(var startRow: Int, var startCol: Int) {
+data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         /**
      * Represents the robot moving in the arena.
      *
@@ -34,9 +35,10 @@ data class Robot(var startRow: Int, var startCol: Int) {
      */
 
     var robotDir: RobotConstants.DIRECTION = RobotConstants.START_DIR
-    var delay: Int = RobotConstants.DELAY
+    var baseDelay: Int = RobotConstants.DELAY
     var row: Int = startRow
     var col: Int = startCol
+    var speed: Int = 1
     private val logger = KotlinLogging.logger {}
 
     private val sensors: Array<Sensor> = arrayOf(
@@ -114,6 +116,7 @@ data class Robot(var startRow: Int, var startCol: Int) {
 
                 sensors[5].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
 
+
             }
         }
         for(sensor in sensors) {
@@ -134,7 +137,7 @@ data class Robot(var startRow: Int, var startCol: Int) {
     }
 
     fun resetRobot() {
-        delay = RobotConstants.DELAY
+        baseDelay = RobotConstants.DELAY
         setRobotPosAndDir(startRow, startCol, RobotConstants.START_DIR)
     }
 
@@ -152,9 +155,11 @@ data class Robot(var startRow: Int, var startCol: Int) {
     }
 
     fun move(m: RobotConstants.MOVEMENT) {
+        row = checkValidRow(row)
+        col = checkValidCol(col)
         // Emulate real movement by pausing execution.
         try {
-            TimeUnit.MILLISECONDS.sleep(delay.toLong())
+            TimeUnit.MILLISECONDS.sleep((baseDelay/speed).toLong())
         } catch (e: InterruptedException) {
             println("Something went wrong in Robot.move()!")
         }
@@ -175,8 +180,10 @@ data class Robot(var startRow: Int, var startCol: Int) {
                 robotDir = findNewDirection(m)
             }
         }
-        logger.debug { "Current robot is located at ($row,$col) facing ${robotDir.print()}" }
+        row = checkValidRow(row)
+        col = checkValidCol(col)
         updateSensorPos()
+        logger.debug { "Current robot is located at ($row,$col) facing ${robotDir.print()}" }
     }
 
     private fun findNewDirection(m: RobotConstants.MOVEMENT): RobotConstants.DIRECTION {
@@ -184,6 +191,65 @@ data class Robot(var startRow: Int, var startCol: Int) {
             RobotConstants.DIRECTION.getNext(robotDir)
         } else {
             RobotConstants.DIRECTION.getPrev(robotDir)
+        }
+    }
+
+    private fun checkValidRow(x: Int): Int {
+        return when {
+            x >= MapConstants.DEFAULT_ROW_SIZE - 2 -> MapConstants.DEFAULT_ROW_SIZE - 2
+            x <= 0 -> 1
+            else -> return x
+        }
+    }
+
+    private fun checkValidCol(y: Int): Int {
+        return when {
+            y >= MapConstants.DEFAULT_COL_SIZE - 2 -> MapConstants.DEFAULT_COL_SIZE - 2
+            y <= 0 -> 1
+            else -> return y
+        }
+    }
+
+    override fun paintComponent(g: Graphics) {
+        // Paint the robot on-screen.
+        g.color = GraphicsConstants.ROBOT_CELL
+        val r: Int = this.row
+        val c: Int = this.col
+        g.fillOval(
+                (c - 1) * GraphicsConstants.CELL_SIZE + GraphicsConstants.ROBOT_X_OFFSET + GraphicsConstants.MAP_X_OFFSET,
+                GraphicsConstants.MAP_H - (r * GraphicsConstants.CELL_SIZE + GraphicsConstants.ROBOT_Y_OFFSET),
+                GraphicsConstants.ROBOT_W,
+                GraphicsConstants.ROBOT_H
+        )
+
+        // Paint the robot's direction indicator on-screen.
+        g.color = GraphicsConstants.ROBOT_DIR_CELL
+        val d: RobotConstants.DIRECTION = this.robotDir
+        when (d) {
+            RobotConstants.DIRECTION.NORTH -> g.fillOval(
+                    c * GraphicsConstants.CELL_SIZE + 10 + GraphicsConstants.MAP_X_OFFSET,
+                    GraphicsConstants.MAP_H - r * GraphicsConstants.CELL_SIZE - 15,
+                    GraphicsConstants.ROBOT_DIR_W,
+                    GraphicsConstants.ROBOT_DIR_H
+            )
+            RobotConstants.DIRECTION.EAST -> g.fillOval(
+                    c * GraphicsConstants.CELL_SIZE + 35 + GraphicsConstants.MAP_X_OFFSET,
+                    GraphicsConstants.MAP_H - r * GraphicsConstants.CELL_SIZE + 10,
+                    GraphicsConstants.ROBOT_DIR_W,
+                    GraphicsConstants.ROBOT_DIR_H
+            )
+            RobotConstants.DIRECTION.SOUTH -> g.fillOval(
+                    c * GraphicsConstants.CELL_SIZE + 10 + GraphicsConstants.MAP_X_OFFSET,
+                    GraphicsConstants.MAP_H - r * GraphicsConstants.CELL_SIZE + 35,
+                    GraphicsConstants.ROBOT_DIR_W,
+                    GraphicsConstants.ROBOT_DIR_H
+            )
+            RobotConstants.DIRECTION.WEST -> g.fillOval(
+                    c * GraphicsConstants.CELL_SIZE - 15 + GraphicsConstants.MAP_X_OFFSET,
+                    GraphicsConstants.MAP_H - r * GraphicsConstants.CELL_SIZE + 10,
+                    GraphicsConstants.ROBOT_DIR_W,
+                    GraphicsConstants.ROBOT_DIR_H
+            )
         }
     }
 

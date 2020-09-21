@@ -1,7 +1,7 @@
 package data.robot
 
-import com.google.gson.JsonObject
 import constants.RobotConstants
+import com.google.gson.JsonObject
 import constants.RobotConstants.FRONT_SENSOR_IDS
 import data.map.MazeMap
 import mu.KotlinLogging

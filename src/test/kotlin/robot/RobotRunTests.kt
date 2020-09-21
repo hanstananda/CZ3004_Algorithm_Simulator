@@ -28,7 +28,7 @@ class RobotRunTests {
         @BeforeEach
         fun `Reset robot`() {
             robot.resetRobot()
-            robot.delay = 0
+            robot.baseDelay = 0
         }
 
         @Test
@@ -65,10 +65,10 @@ class RobotRunTests {
         }
 
         @Test
-        fun `check forward left move loop back to position`() {
+        fun `check forward right move loop back to position`() {
             for(i in 1..4) {
                 robot.move(RobotConstants.MOVEMENT.FORWARD)
-                robot.move(RobotConstants.MOVEMENT.LEFT)
+                robot.move(RobotConstants.MOVEMENT.RIGHT)
             }
             Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
             Assertions.assertEquals(RobotConstants.START_ROW , robot.row)
@@ -76,9 +76,9 @@ class RobotRunTests {
         }
 
         @Test
-        fun `check right backward move loop back to position`() {
+        fun `check left backward move loop back to position`() {
             for(i in 1..4) {
-                robot.move(RobotConstants.MOVEMENT.RIGHT)
+                robot.move(RobotConstants.MOVEMENT.LEFT)
                 robot.move(RobotConstants.MOVEMENT.BACKWARD)
             }
             Assertions.assertEquals(RobotConstants.DIRECTION.NORTH, robot.robotDir)
@@ -97,7 +97,7 @@ class RobotRunTests {
         @BeforeEach
         fun `Initialize robot`() {
             robot.resetRobot()
-            robot.delay = 0
+            robot.baseDelay = 0
             exploredMap.reset()
         }
 
