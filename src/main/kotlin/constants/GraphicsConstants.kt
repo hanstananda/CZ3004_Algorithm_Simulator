@@ -6,7 +6,7 @@ object GraphicsConstants {
     const val CELL_LINE_WEIGHT = 2
     val START_CELL: Color = Color.BLUE
     val GOAL_CELL: Color = Color.GREEN
-    val UNEXPLORED_CELL: Color = Color.LIGHT_GRAY
+    val UNEXPLORED_CELL: Color = Color.GRAY
     val FREE_CELL: Color = Color.LIGHT_GRAY
     val OBSTACLE_CELL: Color = Color.BLACK
     val ROBOT_CELL: Color = Color.RED

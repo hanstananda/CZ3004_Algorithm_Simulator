@@ -201,17 +201,17 @@ object Simulator: ActionListener {
                 if (e.keyCode == KeyEvent.VK_RIGHT) {
                     logger.debug{ "right button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
                     m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_LEFT) {
                     logger.debug{ "left button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.LEFT)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
                     m.repaint()
                 } else if (e.keyCode == KeyEvent.VK_UP) {
                     logger.debug{ "up button pressed" }
                     sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.mazeMap)
+                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
                     m.repaint()
                 }
             }
@@ -263,8 +263,8 @@ object Simulator: ActionListener {
                 val newMap = MazeMap()
                 loadMapFromDisk(newMap,selectedFileString)
                 newMap.setAllExplored()
-                SimulatorServer.mazeMap = newMap
-                sim.map= SimulatorServer.mazeMap
+                SimulatorServer.trueMap = newMap
+                sim.map= SimulatorServer.trueMap
                 val cl = m.layout as CardLayout
                 cl.show(m, "map")
                 updateSimulatorMap()
@@ -278,7 +278,7 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Show True Map")){
-            sim.map = SimulatorServer.mazeMap
+            sim.map = SimulatorServer.trueMap
             updateSimulatorMap()
         }
         if (action.contentEquals("Show Explored Map")){
@@ -296,8 +296,7 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Reset Robot")){
-            sim.bot.resetRobot()
-            updateSimulatorMap()
+            SimulatorServer.resetRobot()
         }
         if (action.contentEquals("Set time limit")){
             val secs = e.source as JComboBox<*>
