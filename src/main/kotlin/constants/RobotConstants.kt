@@ -6,6 +6,9 @@ object RobotConstants {
     const val GOAL_COL = 13
     const val START_ROW = 1
     const val START_COL = 1
+    const val MIN_SPEED = 1
+    const val MAX_SPEED = 7
+    const val DEF_SPEED = 4
     const val SENSOR_SHORT_RANGE_L = 1 // range of short range sensor (cells)
     const val SENSOR_SHORT_RANGE_H = 2 // range of short range sensor (cells)
     const val SENSOR_LONG_RANGE_L = 3 // range of long range sensor (cells)

@@ -14,6 +14,8 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 import javax.swing.*
+import javax.swing.border.TitledBorder
+import javax.swing.event.ChangeEvent
 import kotlin.collections.HashMap
 
 
@@ -22,6 +24,8 @@ object Simulator: ActionListener {
     lateinit var f: JFrame
     lateinit var m: JPanel
     lateinit var b: JPanel
+    lateinit var buttonLayout: GridBagLayout
+    lateinit var gbc: GridBagConstraints
     val logger = KotlinLogging.logger {}
 
     lateinit var sim: SimulatorMap
@@ -50,8 +54,8 @@ object Simulator: ActionListener {
 
     fun displayMainFrame() {
         //initialise main frame
-        f = JFrame("MDP Simulator")
-        f.size = Dimension(700, 820)
+        f = JFrame("MDP Group 28 Simulator")
+        f.size = Dimension(950, 700)
         f.isResizable = false
         f.isFocusable = true
         f.focusTraversalKeysEnabled = false;
@@ -69,7 +73,7 @@ object Simulator: ActionListener {
         //add m & b to the main frame's content pane
         val contentPane = f.contentPane
         contentPane.add(m, BorderLayout.CENTER)
-        contentPane.add(b, BorderLayout.PAGE_END)
+        contentPane.add(b, BorderLayout.EAST)
         initMain()
         initButtons()
 
@@ -87,97 +91,130 @@ object Simulator: ActionListener {
     }
 
     private fun initButtons() {
-        b.layout = GridLayout(4,3)
+        buttonLayout = GridBagLayout()
+        gbc = GridBagConstraints()
+        gbc.fill = GridBagConstraints.BOTH
+        gbc.weightx = 0.5
+        gbc.weighty = 0.5
+        b.layout = buttonLayout
         addButtons()
+    }
+
+    private fun addIndivButton(component: Component, container: Container, layout: GridBagLayout, gbc: GridBagConstraints, gridx: Int, gridy: Int, gridwidth: Int, gridheight: Int, inset: Insets) {
+        gbc.gridx = gridx
+        gbc.gridy = gridy
+        gbc.gridwidth = gridwidth
+        gbc.gridheight = gridheight
+        gbc.insets = inset
+        layout.setConstraints(component, gbc)
+        container.add(component)
     }
 
     private fun addButtons() {
         // Load Map Button
         val loadMapPanel = JPanel()
-        val loadMapLabel = JLabel("Load Map:")
+        val loadMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Load Map ")
+        loadMapBorder.titleJustification = TitledBorder.CENTER
+        loadMapPanel.border = loadMapBorder
         val arr: Array<String?> = getMapFileNames()
         val loadMapButton = JComboBox<String>(arr)
         loadMapButton.isFocusable = false
         loadMapButton.actionCommand = "Load Map"
         loadMapButton.addActionListener(this)
-        loadMapPanel.add(loadMapLabel)
         loadMapPanel.add(loadMapButton)
-        b.add(loadMapPanel)
+        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,0,2,1,Insets(30,30,10,30))
 
         // Show True Map Button
         val showTrueMapButton = JButton("Show True Map")
         showTrueMapButton.isFocusable = false
         showTrueMapButton.actionCommand = "Show True Map"
         showTrueMapButton.addActionListener(this)
-        b.add(showTrueMapButton)
+        addIndivButton(showTrueMapButton,b,buttonLayout,gbc,0,1,1,1, Insets(10,30,10,0))
 
         // Show Explored Map Button
         val showExploredMapButton = JButton("Show Explored Map")
         showExploredMapButton.isFocusable = false
         showExploredMapButton.actionCommand = "Show Explored Map"
         showExploredMapButton.addActionListener(this)
-        b.add(showExploredMapButton)
+        addIndivButton(showExploredMapButton,b,buttonLayout,gbc,1,1,1,1,Insets(10,10,10,30))
 
         // Exploration Button
         val exploreButton = JButton("Exploration")
         exploreButton.isFocusable = false
         exploreButton.actionCommand = "Exploration"
         exploreButton.addActionListener(this)
-        b.add(exploreButton)
+        addIndivButton(exploreButton,b,buttonLayout,gbc,0,2,2,1,Insets(10,30,10,30))
 
         // Fastest Path Button
         val fastestPathButton = JButton("Fastest Path")
         fastestPathButton.isFocusable = false
         fastestPathButton.actionCommand = "Fastest Path"
         fastestPathButton.addActionListener(this)
-        b.add(fastestPathButton)
+        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,3,2,1,Insets(10,30,10,30))
 
         // Reset Robot Button
         val resetButton = JButton("Reset Robot")
         resetButton.isFocusable = false
         resetButton.actionCommand = "Reset Robot"
         resetButton.addActionListener(this)
-        b.add(resetButton)
+        addIndivButton(resetButton,b,buttonLayout,gbc,0,4,2,1,Insets(10,30,10,30))
+
+        // Set Speed Slider
+        val speedPanel = JPanel()
+        val speedBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Robot Speed (step/s) ")
+        speedBorder.titleJustification = TitledBorder.CENTER
+        speedPanel.border = speedBorder
+        val speedSlider = JSlider(JSlider.HORIZONTAL,RobotConstants.MIN_SPEED,RobotConstants.MAX_SPEED,RobotConstants.DEF_SPEED)
+        speedSlider.majorTickSpacing = 1
+        speedSlider.minorTickSpacing = 0
+        speedSlider.paintTicks = true
+        speedSlider.paintLabels = true
+        speedSlider.autoscrolls = true
+        speedSlider.paintTrack = true
+        speedSlider.addChangeListener(
+                fun(e: ChangeEvent) {
+                    val s = e.source as JSlider
+                    if (!s.valueIsAdjusting) {
+                        val sp = s.value
+                        speed_chosen = sp
+                        sim.bot.speed = speed_chosen
+                        logger.debug{"Robot speed set as $speed_chosen step/s"}
+                    }
+                })
+        speedPanel.add(speedSlider)
+        addIndivButton(speedPanel,b,buttonLayout,gbc,0,5,2,1,Insets(10,30,10,30))
 
         // Set Time Limit Button
         val timePanel = JPanel()
-        val timeLabel = JLabel("Set time limit (s):")
+        val timeBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Time limit (s) ")
+        timeBorder.titleJustification = TitledBorder.CENTER
+        timePanel.border = timeBorder
         val timeArr: Array<String?> = createSeqArray(0, 121)
         val timeButton = JComboBox<String>(timeArr)
         timeButton.isFocusable = false
         timeButton.actionCommand = "Set time limit"
         timeButton.addActionListener(this)
-        timePanel.add(timeLabel)
         timePanel.add(timeButton)
-        b.add(timePanel)
+        addIndivButton(timePanel,b,buttonLayout,gbc,0,6,1,1,Insets(10,30,10,0))
 
         // Set Coverage Limit Button
         val coveragePanel = JPanel()
-        val coverageLabel = JLabel("Set coverage limit (%):")
+        val coverageBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Coverage limit (%)  ")
+        coverageBorder.titleJustification = TitledBorder.CENTER
+        coveragePanel.border = coverageBorder
         val coverageArr: Array<String?> = createSeqArray(0, 101)
         val coverageButton = JComboBox<String>(coverageArr)
         coverageButton.isFocusable = false
         coverageButton.actionCommand = "Set % limit"
         coverageButton.addActionListener(this)
-        coveragePanel.add(coverageLabel)
         coveragePanel.add(coverageButton)
-        b.add(coveragePanel)
-
-        // Set Speed Button
-        val speedPanel = JPanel()
-        val speedLabel = JLabel("Set speed (s/step):")
-        val speedArr: Array<String?> = createSeqArray(1,6)
-        val speedButton = JComboBox<String>(speedArr)
-        speedButton.isFocusable = false
-        speedButton.actionCommand = "Set speed"
-        speedButton.addActionListener(this)
-        speedPanel.add(speedLabel)
-        speedPanel.add(speedButton)
-        b.add(speedPanel)
+        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,6,1,1,Insets(10,10,10,30))
 
         // Set Waypoint Button
         val waypointPanel = JPanel()
-        val waypointLabel = JLabel("Set waypoint:")
+        val waypointBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Waypoint ")
+        waypointBorder.titleJustification = TitledBorder.CENTER
+        waypointPanel.border = waypointBorder
         val waypointArrRow: Array<String?> = createSeqArray(1, MapConstants.DEFAULT_ROW_SIZE)
         val waypointArrCol: Array<String?> = createSeqArray(1, MapConstants.DEFAULT_COL_SIZE)
         val waypointRowButton = JComboBox<String>(waypointArrRow)
@@ -188,10 +225,13 @@ object Simulator: ActionListener {
         waypointColButton.actionCommand = "Set Waypoint Col"
         waypointRowButton.addActionListener(this)
         waypointColButton.addActionListener(this)
-        waypointPanel.add(waypointLabel)
+        val rowLabel = JLabel("Row: ")
+        val colLabel = JLabel("Col: ")
+        waypointPanel.add(rowLabel)
         waypointPanel.add(waypointRowButton)
+        waypointPanel.add(colLabel)
         waypointPanel.add(waypointColButton)
-        b.add(waypointPanel)
+        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,7,2,1,Insets(10,30,30,30))
 
     }
 
