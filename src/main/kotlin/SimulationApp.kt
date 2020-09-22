@@ -28,7 +28,7 @@ fun Application.main() {
 
 class SimulationApp {
     private val logger = KotlinLogging.logger {}
-    private val server = SimulatorServer()
+    private val server = SimulatorServer
 
     fun Application.main() {
         /**
@@ -136,7 +136,7 @@ class SimulationApp {
             command.startsWith("/help") -> server.help(id)
             command.startsWith("/generate_random_map") -> server.generateRandomMap()
             command.startsWith("/force_start_exploration") -> server.startExploration()
-            command.startsWith("/force_start_fastest_path") -> server.startWaypoint()
+            command.startsWith("/force_start_fastest_path") -> server.startFastestPathWithWaypoint()
             command.startsWith("/force_reset") -> server.resetRobot()
             // If no commands matched at this point, we notify about it.
             command.startsWith("/") -> server.sendTo(

@@ -7,7 +7,6 @@ import data.map.MazeMap
 
 import mu.KotlinLogging
 
-import java.awt.Color
 import java.awt.Graphics
 import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
@@ -36,7 +35,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
      */
 
     var robotDir: RobotConstants.DIRECTION = RobotConstants.START_DIR
-    var delay: Int = RobotConstants.DELAY
+    var baseDelay: Int = RobotConstants.DELAY
     var row: Int = startRow
     var col: Int = startCol
     var speed: Int = RobotConstants.DEF_SPEED
@@ -138,7 +137,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
     }
 
     fun resetRobot() {
-        delay = RobotConstants.DELAY
+        baseDelay = RobotConstants.DELAY
         setRobotPosAndDir(startRow, startCol, RobotConstants.START_DIR)
     }
 
@@ -160,7 +159,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         col = checkValidCol(col)
         // Emulate real movement by pausing execution.
         try {
-            TimeUnit.MILLISECONDS.sleep(delay.toLong())
+            TimeUnit.MILLISECONDS.sleep((baseDelay/speed).toLong())
         } catch (e: InterruptedException) {
             println("Something went wrong in Robot.move()!")
         }
@@ -181,10 +180,10 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
                 robotDir = findNewDirection(m)
             }
         }
-        logger.debug { "Current robot is located at ($row,$col) facing ${robotDir.print()}" }
-        updateSensorPos()
         row = checkValidRow(row)
         col = checkValidCol(col)
+        updateSensorPos()
+        logger.debug { "Current robot is located at ($row,$col) facing ${robotDir.print()}" }
     }
 
     private fun findNewDirection(m: RobotConstants.MOVEMENT): RobotConstants.DIRECTION {
@@ -196,25 +195,19 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
     }
 
     private fun checkValidRow(x: Int): Int {
-        var x = x
-        if (x >= MapConstants.DEFAULT_ROW_SIZE - 2) {
-            x = MapConstants.DEFAULT_ROW_SIZE - 2
+        return when {
+            x >= MapConstants.DEFAULT_ROW_SIZE - 2 -> MapConstants.DEFAULT_ROW_SIZE - 2
+            x <= 0 -> 1
+            else -> return x
         }
-        if (x <= 0) {
-            x = 1
-        }
-        return x
     }
 
     private fun checkValidCol(y: Int): Int {
-        var y = y
-        if (y >= MapConstants.DEFAULT_COL_SIZE - 2) {
-            y = MapConstants.DEFAULT_COL_SIZE - 2
+        return when {
+            y >= MapConstants.DEFAULT_COL_SIZE - 2 -> MapConstants.DEFAULT_COL_SIZE - 2
+            y <= 0 -> 1
+            else -> return y
         }
-        if (y <= 0) {
-            y = 1
-        }
-        return y
     }
 
     override fun paintComponent(g: Graphics) {

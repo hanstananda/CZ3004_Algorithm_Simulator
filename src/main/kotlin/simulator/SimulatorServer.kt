@@ -34,20 +34,16 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 
-class SimulatorServer {
+object SimulatorServer {
     private val logger = KotlinLogging.logger {}
     private val members = ConcurrentHashMap<String, MutableList<WebSocketSession>>()
     lateinit var latestMember: String
-
-    companion object {
-        var mazeMap = MazeMap()
-        var exploredMap = MazeMap()
-        val robot = Robot(START_ROW, START_COL)
-    }
+    var trueMap = MazeMap()
+    var exploredMap = MazeMap()
+    val robot = Robot(START_ROW, START_COL)
 
     init {
-        loadMapFromDisk(mazeMap, "TestMap1")
-        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
+        resetMapAndRobot()
         Simulator.displayMainFrame()
     }
 
@@ -55,7 +51,7 @@ class SimulatorServer {
 //        if (logger.isDebugEnabled) {
 //            debugMap(mazeMap = exploredMap, robot = robot)
 //        }
-        Simulator.updateSimulatorMap(SimulatorMap(mazeMap, robot))
+        Simulator.updateSimulatorMap(SimulatorMap(trueMap, robot))
     }
 
     suspend fun help(sender: String) {
@@ -109,7 +105,7 @@ class SimulatorServer {
         members[latestMember]?.send(Frame.Text(command))
     }
 
-    suspend fun startWaypoint(x: Int = START_COL, y: Int = START_ROW) {
+    suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
         val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
         commandMap["waypoint"] = "[$x,$y]"
         val command = Gson().toJson(commandMap)
@@ -117,7 +113,7 @@ class SimulatorServer {
     }
 
     fun generateRandomMap() {
-        mazeMap = RandomMapGenerator.createValidatedRandomMazeMap()
+        trueMap = RandomMapGenerator.createValidatedRandomMazeMap()
         updateSimulation()
     }
 
@@ -184,7 +180,7 @@ class SimulatorServer {
             }
             commandType.startsWith(LOAD_TEST_MAP_COMMAND) -> {
                 val filename = request["filename"] ?: "TestMap1"
-                loadMapFromDisk(mazeMap, filename)
+                loadMapFromDisk(trueMap, filename)
                 response = Gson().toJson(FINISHED_COMMAND)
             }
             else -> {
@@ -197,7 +193,7 @@ class SimulatorServer {
 
 
     private suspend fun sendSensorTelemetry(sender: String) {
-        val sensorReadings = robot.getSensorReadings(exploredMap, mazeMap)
+        val sensorReadings = robot.getSensorReadings(exploredMap, trueMap)
         for (result in sensorReadings) {
             val response = Gson().toJson(
                 mapOf(
@@ -209,6 +205,7 @@ class SimulatorServer {
             logger.debug { response }
             members[sender]?.send(Frame.Text(response))
         }
+        debugMap(exploredMap)
     }
 
     /**
@@ -233,11 +230,17 @@ class SimulatorServer {
     }
 
     fun resetRobot() {
-        exploredMap = MazeMap()
-        loadMapFromDisk(mazeMap, "TestMap1")
-        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(mazeMap, robot))
-        robot.resetRobot()
+        resetMapAndRobot()
         updateSimulation()
+    }
+
+    private fun resetMapAndRobot() {
+        exploredMap = MazeMap()
+        loadMapFromDisk(trueMap, "TestMap1")
+        trueMap.setAllExplored()
+        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(trueMap, robot))
+        robot.resetRobot()
+        robot.simulateSensors(exploredMap, trueMap)
     }
 
 }
