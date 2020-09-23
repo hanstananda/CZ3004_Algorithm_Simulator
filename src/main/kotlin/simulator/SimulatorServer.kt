@@ -43,7 +43,7 @@ object SimulatorServer {
     val robot = Robot(START_ROW, START_COL)
 
     init {
-        resetMapAndRobot()
+        resetToInitialServerState()
         Simulator.displayMainFrame()
     }
 
@@ -229,16 +229,16 @@ object SimulatorServer {
         members[recipient]?.send(Frame.Text("[$sender] $message"))
     }
 
-    fun resetRobot() {
-        resetMapAndRobot()
-        updateSimulation()
-    }
-
-    private fun resetMapAndRobot() {
-        exploredMap = MazeMap()
+    fun resetToInitialServerState() {
+        resetExploredMapAndRobot()
         loadMapFromDisk(trueMap, "TestMap1")
         trueMap.setAllExplored()
         Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(trueMap, robot))
+        updateSimulation()
+    }
+
+    fun resetExploredMapAndRobot() {
+        exploredMap = MazeMap()
         robot.resetRobot()
         robot.simulateSensors(exploredMap, trueMap)
     }
