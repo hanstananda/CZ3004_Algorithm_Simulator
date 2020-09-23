@@ -14,7 +14,7 @@ object RobotConstants {
     const val SENSOR_LONG_RANGE_L = 1 // lower range of long range sensor (cells)
     const val SENSOR_LONG_RANGE_H = 5 // upper range of long range sensor (cells)
     val START_DIR = DIRECTION.NORTH
-    const val DELAY = 100
+    const val DELAY = 1000
     val FRONT_SENSOR_IDS = setOf("IRS_FL", "IRS_FM", "IRS_FR")
 
 
