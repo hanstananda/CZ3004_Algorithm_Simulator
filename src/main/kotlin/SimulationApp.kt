@@ -137,7 +137,7 @@ class SimulationApp {
             command.startsWith("/generate_random_map") -> server.generateRandomMap()
             command.startsWith("/force_start_exploration") -> server.startExploration()
             command.startsWith("/force_start_fastest_path") -> server.startFastestPathWithWaypoint()
-            command.startsWith("/force_reset") -> server.resetRobot()
+            command.startsWith("/force_reset") -> server.resetToInitialServerState()
             // If no commands matched at this point, we notify about it.
             command.startsWith("/") -> server.sendTo(
                 id,

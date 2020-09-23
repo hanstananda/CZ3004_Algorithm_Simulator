@@ -304,6 +304,7 @@ object Simulator: ActionListener {
                 loadMapFromDisk(newMap,selectedFileString)
                 newMap.setAllExplored()
                 SimulatorServer.trueMap = newMap
+                SimulatorServer.resetExploredMapAndRobot()
                 sim.map= SimulatorServer.trueMap
                 val cl = m.layout as CardLayout
                 cl.show(m, "map")
@@ -336,7 +337,9 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Reset Robot")){
-            SimulatorServer.resetRobot()
+            SimulatorServer.resetExploredMapAndRobot()
+            sim.map = SimulatorServer.trueMap
+            updateSimulatorMap()
         }
         if (action.contentEquals("Set time limit")){
             val secs = e.source as JComboBox<*>
