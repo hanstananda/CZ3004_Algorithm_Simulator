@@ -6,6 +6,7 @@ import data.map.MazeMap
 import data.robot.Robot
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import utils.map.debugMap
 import utils.map.loadMapFromDisk
 import java.awt.*
 import java.awt.event.*
@@ -44,8 +45,7 @@ object Simulator: ActionListener {
         displayMainFrame()
     }
 
-    fun updateSimulatorMap(simulatorMap: SimulatorMap = sim) {
-        sim = simulatorMap
+    fun updateSimulatorMap() {
         if(this::m.isInitialized) {
             m.repaint()
             logger.debug { "Map repainted!" }

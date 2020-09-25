@@ -11,13 +11,14 @@ object CommConstants {
     const val ROTATE_COMMAND = "rotate"
     const val IMAGE_COMMAND = "image_detect"
     const val OBSTACLE_DETECT_COMMAND = "obstacle_detect"
+    const val EXPLORED_COMMAND = "explored"
     const val LOAD_TEST_MAP_COMMAND = "load_test_map"
 
     const val SENSOR_READ_COMMAND = "sensor_read"
 
     val MOVING_STATUS = mapOf("status" to "moving")
     val ROTATING_STATUS = mapOf("status" to "rotating")
-    val STOP_STATUS = mapOf("status" to "stopped")
+    val COMPLETED_STATUS = mapOf("status" to "completed")
     val FINISHED_COMMAND = mapOf("status" to "Command executed!")
     val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
     val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")
