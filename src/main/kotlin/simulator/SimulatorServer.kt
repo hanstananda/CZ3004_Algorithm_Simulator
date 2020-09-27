@@ -1,28 +1,25 @@
 package simulator
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import constants.CommConstants.BACKWARD_COMMAND
-import constants.CommConstants.COMMAND
 import constants.CommConstants.EXPLORATION_START_COMMAND
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
-import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.LEFT_COMMAND
 import constants.CommConstants.LOAD_TEST_MAP_COMMAND
 import constants.CommConstants.MOVEMENT_COMMAND
-import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
-import constants.CommConstants.STOP_STATUS
+import constants.CommConstants.COMPLETED_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
+import data.simulator.ParsedRequest
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import mu.KotlinLogging
@@ -40,18 +37,20 @@ object SimulatorServer {
     lateinit var latestMember: String
     var trueMap = MazeMap()
     var exploredMap = MazeMap()
+    var realTimeMap = MazeMap()
     val robot = Robot(START_ROW, START_COL)
 
     init {
-        resetMapAndRobot()
+        Simulator.sim = SimulatorMap(trueMap, robot)
+        resetToInitialServerState()
         Simulator.displayMainFrame()
     }
 
-    private fun updateSimulation() {
+    private fun updateSimulationUI() {
 //        if (logger.isDebugEnabled) {
 //            debugMap(mazeMap = exploredMap, robot = robot)
 //        }
-        Simulator.updateSimulatorMap(SimulatorMap(trueMap, robot))
+        Simulator.updateSimulatorMap()
     }
 
     suspend fun help(sender: String) {
@@ -114,35 +113,68 @@ object SimulatorServer {
 
     fun generateRandomMap() {
         trueMap = RandomMapGenerator.createValidatedRandomMazeMap()
-        updateSimulation()
+        updateSimulationUI()
     }
 
     suspend fun message(sender: String, message: String) {
-        val request: Map<String, String> =
-            Gson().fromJson(message, object : TypeToken<HashMap<String, String>>() {}.type)
+        val request =
+            Gson().fromJson(message, ParsedRequest::class.java)
 
         // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
-        val commandType: String? = request[COMMAND]
+        val commandType: String? = request.command
+        val obstacleDetect: Array<Int>? = request.obstacleDetect
+        val imageDetect: Array<Int>? = request.imageDetect
+        val exploredInfo: Array<Int>? = request.exploredInfo
         val response: String
         when {
+            obstacleDetect != null -> {
+                val (xPos, yPos) = obstacleDetect
+                logger.info { "Received obstacle info at ($xPos, $yPos) "}
+                if(realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                    realTimeMap.setObstacle(yPos, xPos, true)
+                }
+                else {
+                    logger.warn {"received coordinate is invalid!"}
+                }
+                response = Gson().toJson(FINISHED_COMMAND)
+                Simulator.sim.map = realTimeMap
+                debugMap(realTimeMap, robot)
+            }
+            exploredInfo != null -> {
+                val (xPos, yPos) = exploredInfo
+                logger.info { "Received explored info at ($xPos, $yPos) "}
+                if(realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                    realTimeMap.grid[yPos][xPos].explored = true
+                }
+                else {
+                    logger.warn {"received coordinate is invalid!"}
+                }
+                response = Gson().toJson(FINISHED_COMMAND)
+                Simulator.sim.map = realTimeMap
+                debugMap(realTimeMap, robot)
+            }
+            imageDetect != null -> {
+                logger.info { imageDetect }
+                response = Gson().toJson(FINISHED_COMMAND)
+            }
             commandType == null -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
             }
             commandType.startsWith(MOVEMENT_COMMAND) -> {
-                val units = (request["units"] ?: "1").toInt()
+                val units = (request.unit ?: "1").toInt()
                 when (commandType) {
                     FORWARD_COMMAND -> {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.FORWARD)
                         }
-                        response = Gson().toJson(STOP_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     BACKWARD_COMMAND -> {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.BACKWARD)
                         }
-                        response = Gson().toJson(STOP_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
@@ -151,20 +183,20 @@ object SimulatorServer {
                 }
             }
             commandType.startsWith(ROTATE_COMMAND) -> {
-                val angle = (request["angle"] ?: "90").toInt()
+                val angle = (request.angle ?: "90").toInt()
                 when (commandType) {
                     RIGHT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.RIGHT)
                         }
-                        response = Gson().toJson(STOP_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     LEFT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.LEFT)
                         }
-                        response = Gson().toJson(STOP_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
@@ -172,14 +204,8 @@ object SimulatorServer {
                     }
                 }
             }
-            commandType.startsWith(IMAGE_COMMAND) -> {
-                response = Gson().toJson(STOP_STATUS)
-            }
-            commandType.startsWith(OBSTACLE_DETECT_COMMAND) -> {
-                response = Gson().toJson(STOP_STATUS)
-            }
             commandType.startsWith(LOAD_TEST_MAP_COMMAND) -> {
-                val filename = request["filename"] ?: "TestMap1"
+                val filename = request.filename ?: "TestMap1"
                 loadMapFromDisk(trueMap, filename)
                 response = Gson().toJson(FINISHED_COMMAND)
             }
@@ -188,7 +214,7 @@ object SimulatorServer {
             }
         }
         members[sender]?.send(Frame.Text(response))
-        updateSimulation()
+        updateSimulationUI()
     }
 
 
@@ -229,18 +255,22 @@ object SimulatorServer {
         members[recipient]?.send(Frame.Text("[$sender] $message"))
     }
 
-    fun resetRobot() {
-        resetMapAndRobot()
-        updateSimulation()
-    }
-
-    private fun resetMapAndRobot() {
-        exploredMap = MazeMap()
+    fun resetToInitialServerState() {
+        resetExploredMapAndRobot()
+        resetRealTimeMap()
         loadMapFromDisk(trueMap, "TestMap1")
         trueMap.setAllExplored()
-        Simulator.updateSimulatorMap(simulatorMap = SimulatorMap(trueMap, robot))
+        updateSimulationUI()
+    }
+
+    fun resetExploredMapAndRobot() {
+        exploredMap = MazeMap()
         robot.resetRobot()
         robot.simulateSensors(exploredMap, trueMap)
+    }
+
+    fun resetRealTimeMap() {
+        realTimeMap = MazeMap()
     }
 
 }

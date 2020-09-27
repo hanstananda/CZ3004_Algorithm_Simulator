@@ -6,6 +6,7 @@ import data.map.MazeMap
 import data.robot.Robot
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import utils.map.debugMap
 import utils.map.loadMapFromDisk
 import java.awt.*
 import java.awt.event.*
@@ -44,8 +45,7 @@ object Simulator: ActionListener {
         displayMainFrame()
     }
 
-    fun updateSimulatorMap(simulatorMap: SimulatorMap = sim) {
-        sim = simulatorMap
+    fun updateSimulatorMap() {
         if(this::m.isInitialized) {
             m.repaint()
             logger.debug { "Map repainted!" }
@@ -304,6 +304,7 @@ object Simulator: ActionListener {
                 loadMapFromDisk(newMap,selectedFileString)
                 newMap.setAllExplored()
                 SimulatorServer.trueMap = newMap
+                SimulatorServer.resetExploredMapAndRobot()
                 sim.map= SimulatorServer.trueMap
                 val cl = m.layout as CardLayout
                 cl.show(m, "map")
@@ -336,7 +337,9 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Reset Robot")){
-            SimulatorServer.resetRobot()
+            SimulatorServer.resetExploredMapAndRobot()
+            sim.map = SimulatorServer.trueMap
+            updateSimulatorMap()
         }
         if (action.contentEquals("Set time limit")){
             val secs = e.source as JComboBox<*>
