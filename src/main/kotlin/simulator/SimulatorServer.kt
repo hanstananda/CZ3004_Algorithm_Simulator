@@ -43,7 +43,12 @@ object SimulatorServer {
     init {
         Simulator.sim = SimulatorMap(trueMap, robot)
         resetToInitialServerState()
-        Simulator.displayMainFrame()
+        if (Simulator.real_run) {
+            Simulator.displayMainRealRunFrame()
+        }
+        else {
+            Simulator.displayMainSimulatorFrame()
+        }
     }
 
     private fun updateSimulationUI() {

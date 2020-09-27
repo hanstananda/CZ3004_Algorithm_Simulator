@@ -6,10 +6,12 @@ import data.map.MazeMap
 import data.robot.Robot
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import utils.map.debugMap
 import utils.map.loadMapFromDisk
 import java.awt.*
-import java.awt.event.*
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -18,6 +20,7 @@ import javax.swing.*
 import javax.swing.border.TitledBorder
 import javax.swing.event.ChangeEvent
 import kotlin.collections.HashMap
+import kotlin.system.exitProcess
 
 
 object Simulator: ActionListener {
@@ -36,13 +39,41 @@ object Simulator: ActionListener {
     private var percentage_chosen = 100
     private var speed_chosen = 1
 
+    var real_run = false
+
     @JvmStatic
     fun main(args: Array<String>) {
         val map = MazeMap()
         map.initExploredAreas()
         val bot = Robot(1, 1)
         sim = SimulatorMap(map, bot)
-        displayMainFrame()
+        var checked = false
+        while (!checked) {
+            checked = checkRealRun()
+            print(real_run)
+        }
+        if (real_run) {
+            displayMainRealRunFrame()
+        }
+        else {
+            displayMainSimulatorFrame()
+        }
+    }
+
+    private fun checkRealRun(): Boolean {
+        var result = JOptionPane.showConfirmDialog(null, "Is this the real run?", "MDP Group 28", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+        if (result == JOptionPane.YES_OPTION) {
+            real_run = true
+            return true
+        }
+        if (result == JOptionPane.NO_OPTION) {
+            real_run = false
+            return true
+        }
+        if (result == JOptionPane.CLOSED_OPTION){
+            exitProcess(1)
+        }
+        return false
     }
 
     fun updateSimulatorMap() {
@@ -52,7 +83,7 @@ object Simulator: ActionListener {
         }
     }
 
-    fun displayMainFrame() {
+    fun displayMainSimulatorFrame() {
         //initialise main frame
         f = JFrame("MDP Group 28 Simulator")
         f.size = Dimension(950, 700)
@@ -77,8 +108,35 @@ object Simulator: ActionListener {
         initMain()
         initButtons()
 
-        // movement buttons to move robot
-        initMovementButtons()
+        //load blank map
+        loadMap(MapConstants.DEFAULT_MAP)
+
+        f.isVisible = true
+        f.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    }
+
+    fun displayMainRealRunFrame() {
+        //initialise main frame
+        f = JFrame("MDP Group 28 Real Run")
+        f.size = Dimension(700, 700)
+        f.isResizable = false
+        f.isFocusable = true
+        f.focusTraversalKeysEnabled = false;
+
+        //center main frame
+        val dim = Toolkit.getDefaultToolkit().screenSize
+        f.setLocation(dim.width / 2 - f.size.width / 2, dim.height / 2 - f.size.height / 2)
+
+        //create CardLayout for storing different maps and robot
+        m = JPanel(CardLayout())
+
+        //add m to the main frame's content pane
+        val contentPane = f.contentPane
+        contentPane.add(m, BorderLayout.CENTER)
+        initMain()
+
+        //load blank map
+        loadMap(MapConstants.DEFAULT_MAP)
 
         f.isVisible = true
         f.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -91,6 +149,9 @@ object Simulator: ActionListener {
     }
 
     private fun initButtons() {
+        // movement buttons to move robot
+        initMovementButtons()
+
         buttonLayout = GridBagLayout()
         gbc = GridBagConstraints()
         gbc.fill = GridBagConstraints.BOTH
@@ -238,21 +299,25 @@ object Simulator: ActionListener {
     private fun initMovementButtons() {
         f.addKeyListener(object : KeyListener {
             override fun keyPressed(e: KeyEvent) {
-                if (e.keyCode == KeyEvent.VK_RIGHT) {
-                    logger.debug{ "right button pressed" }
-                    sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
-                    m.repaint()
-                } else if (e.keyCode == KeyEvent.VK_LEFT) {
-                    logger.debug{ "left button pressed" }
-                    sim.bot.move(RobotConstants.MOVEMENT.LEFT)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
-                    m.repaint()
-                } else if (e.keyCode == KeyEvent.VK_UP) {
-                    logger.debug{ "up button pressed" }
-                    sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
-                    sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
-                    m.repaint()
+                when (e.keyCode) {
+                    KeyEvent.VK_RIGHT -> {
+                        logger.debug{ "right button pressed" }
+                        sim.bot.move(RobotConstants.MOVEMENT.RIGHT)
+                        sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
+                        m.repaint()
+                    }
+                    KeyEvent.VK_LEFT -> {
+                        logger.debug{ "left button pressed" }
+                        sim.bot.move(RobotConstants.MOVEMENT.LEFT)
+                        sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
+                        m.repaint()
+                    }
+                    KeyEvent.VK_UP -> {
+                        logger.debug{ "up button pressed" }
+                        sim.bot.move(RobotConstants.MOVEMENT.FORWARD)
+                        sim.bot.simulateSensors(SimulatorServer.exploredMap, SimulatorServer.trueMap)
+                        m.repaint()
+                    }
                 }
             }
 
@@ -293,30 +358,33 @@ object Simulator: ActionListener {
         return arr
     }
 
+    private fun loadMap(selectedFileString: String) {
+        try {
+            val newMap = MazeMap()
+            loadMapFromDisk(newMap,selectedFileString)
+            newMap.setAllExplored()
+            SimulatorServer.trueMap = newMap
+            SimulatorServer.resetExploredMapAndRobot()
+            sim.map= SimulatorServer.trueMap
+            val cl = m.layout as CardLayout
+            cl.show(m, "map")
+            updateSimulatorMap()
+        } catch (f: FileNotFoundException) {
+            logger.debug{"File not found"}
+        } catch (IO: IOException) {
+            logger.debug{"IOException when reading$selectedFileString"}
+        } catch (eX: Exception) {
+            logger.debug{eX.message}
+        }
+    }
+
     override fun actionPerformed(e: ActionEvent?) {
         val action = e!!.actionCommand
         if (action!!.contentEquals("Load Map")) {
             val arenaMap = e.source as JComboBox<*>
             val selectedFile = arenaMap.selectedItem ?: return
             val selectedFileString = arenaMap.selectedItem as String
-            try {
-                val newMap = MazeMap()
-                loadMapFromDisk(newMap,selectedFileString)
-                newMap.setAllExplored()
-                SimulatorServer.trueMap = newMap
-                SimulatorServer.resetExploredMapAndRobot()
-                sim.map= SimulatorServer.trueMap
-                val cl = m.layout as CardLayout
-                cl.show(m, "map")
-                updateSimulatorMap()
-
-            } catch (f: FileNotFoundException) {
-                logger.debug{"File not found"}
-            } catch (IO: IOException) {
-                logger.debug{"IOException when reading$selectedFile"}
-            } catch (eX: Exception) {
-                logger.debug{eX.message}
-            }
+            loadMap(selectedFileString)
         }
         if (action.contentEquals("Show True Map")){
             sim.map = SimulatorServer.trueMap
