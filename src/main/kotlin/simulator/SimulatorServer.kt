@@ -14,6 +14,7 @@ import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.COMPLETED_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
+import constants.MapConstants.DEFAULT_MAP
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
@@ -43,7 +44,7 @@ object SimulatorServer {
     init {
         Simulator.sim = SimulatorMap(trueMap, robot)
         resetToInitialServerState()
-        Simulator.displayMainFrame()
+        Simulator.displayFrame()
     }
 
     private fun updateSimulationUI() {
@@ -137,8 +138,8 @@ object SimulatorServer {
                     logger.warn {"received coordinate is invalid!"}
                 }
                 response = Gson().toJson(FINISHED_COMMAND)
-                Simulator.sim.map = realTimeMap
-                debugMap(realTimeMap, robot)
+//                Simulator.sim.map = realTimeMap
+//                debugMap(realTimeMap, robot)
             }
             exploredInfo != null -> {
                 val (xPos, yPos) = exploredInfo
@@ -150,8 +151,8 @@ object SimulatorServer {
                     logger.warn {"received coordinate is invalid!"}
                 }
                 response = Gson().toJson(FINISHED_COMMAND)
-                Simulator.sim.map = realTimeMap
-                debugMap(realTimeMap, robot)
+//                Simulator.sim.map = realTimeMap
+//                debugMap(realTimeMap, robot)
             }
             imageDetect != null -> {
                 logger.info { imageDetect }
@@ -258,7 +259,7 @@ object SimulatorServer {
     fun resetToInitialServerState() {
         resetExploredMapAndRobot()
         resetRealTimeMap()
-        loadMapFromDisk(trueMap, "TestMap1")
+        loadMapFromDisk(trueMap, DEFAULT_MAP)
         trueMap.setAllExplored()
         updateSimulationUI()
     }
