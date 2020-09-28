@@ -47,6 +47,10 @@ object Simulator: ActionListener {
         map.initExploredAreas()
         val bot = Robot(1, 1)
         sim = SimulatorMap(map, bot)
+        displayFrame()
+    }
+
+    fun displayFrame() {
         var checked = false
         while (!checked) {
             checked = checkRealRun()
@@ -135,8 +139,8 @@ object Simulator: ActionListener {
         contentPane.add(m, BorderLayout.CENTER)
         initMain()
 
-        //load blank map
-        loadMap(MapConstants.DEFAULT_MAP)
+        //load realtime map from server
+        sim.map = SimulatorServer.realTimeMap
 
         f.isVisible = true
         f.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
