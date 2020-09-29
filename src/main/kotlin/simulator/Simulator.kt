@@ -38,6 +38,8 @@ object Simulator: ActionListener {
     private var time_chosen = -1
     private var percentage_chosen = 100
     private var speed_chosen = 1
+    private var checked = false
+    private var displayed = false
 
     var real_run = false
 
@@ -51,16 +53,17 @@ object Simulator: ActionListener {
     }
 
     fun displayFrame() {
-        var checked = false
         while (!checked) {
             checked = checkRealRun()
-            print(real_run)
         }
-        if (real_run) {
-            displayMainRealRunFrame()
-        }
-        else {
-            displayMainSimulatorFrame()
+        if(!displayed) {
+            if (real_run) {
+                displayMainRealRunFrame()
+            }
+            else {
+                displayMainSimulatorFrame()
+            }
+            displayed = true
         }
     }
 
@@ -189,19 +192,18 @@ object Simulator: ActionListener {
         loadMapPanel.add(loadMapButton)
         addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,0,2,1,Insets(30,30,10,30))
 
-        // Show True Map Button
-        val showTrueMapButton = JButton("Show True Map")
-        showTrueMapButton.isFocusable = false
-        showTrueMapButton.actionCommand = "Show True Map"
-        showTrueMapButton.addActionListener(this)
-        addIndivButton(showTrueMapButton,b,buttonLayout,gbc,0,1,1,1, Insets(10,30,10,0))
-
-        // Show Explored Map Button
-        val showExploredMapButton = JButton("Show Explored Map")
-        showExploredMapButton.isFocusable = false
-        showExploredMapButton.actionCommand = "Show Explored Map"
-        showExploredMapButton.addActionListener(this)
-        addIndivButton(showExploredMapButton,b,buttonLayout,gbc,1,1,1,1,Insets(10,10,10,30))
+        // Show Map Button
+        val showMapPanel = JPanel()
+        val showMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Display Map ")
+        showMapBorder.titleJustification = TitledBorder.CENTER
+        showMapPanel.border = showMapBorder
+        val types = arrayOf ("True Map", "Explored Map", "Real-Time Map")
+        val showMapButton = JComboBox<String>(types)
+        showMapButton.isFocusable = false
+        showMapButton.actionCommand = "Display Map"
+        showMapButton.addActionListener(this)
+        showMapPanel.add(showMapButton)
+        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(30,30,10,30))
 
         // Exploration Button
         val exploreButton = JButton("Exploration")
@@ -386,17 +388,29 @@ object Simulator: ActionListener {
         val action = e!!.actionCommand
         if (action!!.contentEquals("Load Map")) {
             val arenaMap = e.source as JComboBox<*>
-            val selectedFile = arenaMap.selectedItem ?: return
             val selectedFileString = arenaMap.selectedItem as String
             loadMap(selectedFileString)
         }
-        if (action.contentEquals("Show True Map")){
-            sim.map = SimulatorServer.trueMap
-            updateSimulatorMap()
-        }
-        if (action.contentEquals("Show Explored Map")){
-            sim.map = SimulatorServer.exploredMap
-            updateSimulatorMap()
+        if (action!!.contentEquals("Display Map")) {
+            val mapType = e.source as JComboBox<*>
+            when (mapType.selectedItem as String){
+                "True Map" -> {
+                    sim.map = SimulatorServer.trueMap
+                    updateSimulatorMap()
+                }
+                "Explored Map" -> {
+                    sim.map = SimulatorServer.exploredMap
+                    updateSimulatorMap()
+                }
+                "Real-Time Map" -> {
+                    sim.map = SimulatorServer.realTimeMap
+                    updateSimulatorMap()
+                }
+                else -> {
+                    sim.map = SimulatorServer.trueMap
+                    updateSimulatorMap()
+                }
+            }
         }
         if (action.contentEquals("Exploration")){
             runBlocking {
