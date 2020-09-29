@@ -1,8 +1,8 @@
 package simulator
 
 import com.google.gson.Gson
+import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
-import constants.CommConstants.EXPLORATION_START_COMMAND
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
@@ -13,6 +13,7 @@ import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.COMPLETED_STATUS
+import constants.CommConstants.EXPLORATION_STOP_COMMAND
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
 import constants.MapConstants.DEFAULT_MAP
 import constants.RobotConstants
@@ -22,6 +23,7 @@ import data.map.MazeMap
 import data.robot.Robot
 import data.simulator.ParsedRequest
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import mu.KotlinLogging
 import utils.map.RandomMapGenerator
@@ -30,6 +32,7 @@ import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 
 object SimulatorServer {
@@ -100,9 +103,36 @@ object SimulatorServer {
         }
     }
 
-    suspend fun startExploration() {
-        val command = Gson().toJson(EXPLORATION_START_COMMAND)
+    fun handleStartExploration(timeout: Int = -1, coverageLimit: Int = 100) {
+        when {
+            timeout != -1 -> {
+                GlobalScope.launch(Dispatchers.Default) {
+                    logger.info { "Starting exploration with timeout of $timeout" }
+                    startExplorationWithCoverage(coverageLimit)
+                    delay(TimeUnit.SECONDS.toMillis(timeout.toLong()))
+                    stopExploration("Timeout reached")
+                }
+            }
+            else -> {
+                GlobalScope.launch {
+                    startExplorationWithCoverage(coverageLimit)
+                }
+            }
+        }
+    }
+
+    suspend fun startExplorationWithCoverage(coverageLimit: Int = 100) {
+        val startExplorationCommandObject = CommConstants.StartExplorationCommand(coverageLimit)
+        val command = Gson().toJson(startExplorationCommandObject)
         members[latestMember]?.send(Frame.Text(command))
+    }
+
+    suspend fun stopExploration(reason: String = "force-stop") {
+        val commandMap = HashMap(EXPLORATION_STOP_COMMAND) // copy the basic command
+        commandMap["reason"] = reason
+        val command = Gson().toJson(commandMap)
+        members[latestMember]?.send(Frame.Text(command))
+        logger.info { "Sent stop exploration with reason $reason" }
     }
 
     suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
@@ -130,12 +160,11 @@ object SimulatorServer {
         when {
             obstacleDetect != null -> {
                 val (xPos, yPos) = obstacleDetect
-                logger.info { "Received obstacle info at ($xPos, $yPos) "}
-                if(realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                logger.info { "Received obstacle info at ($xPos, $yPos) " }
+                if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
                     realTimeMap.setObstacle(yPos, xPos, true)
-                }
-                else {
-                    logger.warn {"received coordinate is invalid!"}
+                } else {
+                    logger.warn { "received coordinate is invalid!" }
                 }
                 response = Gson().toJson(FINISHED_COMMAND)
 //                Simulator.sim.map = realTimeMap
@@ -143,12 +172,11 @@ object SimulatorServer {
             }
             exploredInfo != null -> {
                 val (xPos, yPos) = exploredInfo
-                logger.info { "Received explored info at ($xPos, $yPos) "}
-                if(realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                logger.info { "Received explored info at ($xPos, $yPos) " }
+                if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
                     realTimeMap.grid[yPos][xPos].explored = true
-                }
-                else {
-                    logger.warn {"received coordinate is invalid!"}
+                } else {
+                    logger.warn { "received coordinate is invalid!" }
                 }
                 response = Gson().toJson(FINISHED_COMMAND)
 //                Simulator.sim.map = realTimeMap
