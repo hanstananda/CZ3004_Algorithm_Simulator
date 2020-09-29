@@ -38,6 +38,8 @@ object Simulator: ActionListener {
     private var time_chosen = -1
     private var percentage_chosen = 100
     private var speed_chosen = 1
+    private var checked = false
+    private var displayed = false
 
     var real_run = false
 
@@ -47,19 +49,21 @@ object Simulator: ActionListener {
         map.initExploredAreas()
         val bot = Robot(1, 1)
         sim = SimulatorMap(map, bot)
-        var checked = false
-        while (!checked) {
-            checked = checkRealRun()
-        }
         displayFrame()
     }
 
     fun displayFrame() {
-        if (real_run) {
-            displayMainRealRunFrame()
+        while (!checked) {
+            checked = checkRealRun()
         }
-        else {
-            displayMainSimulatorFrame()
+        if(!displayed) {
+            if (real_run) {
+                displayMainRealRunFrame()
+            }
+            else {
+                displayMainSimulatorFrame()
+            }
+            displayed = true
         }
     }
 
