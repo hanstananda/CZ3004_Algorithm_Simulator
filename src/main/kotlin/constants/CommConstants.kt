@@ -25,7 +25,6 @@ object CommConstants {
     val FINISHED_COMMAND = mapOf("status" to "Command executed!")
     val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
     val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")
-    val EXPLORATION_START_COMMAND = mapOf("request" to "start_explore")
     data class StartExplorationCommand(val coverageLimit: Int = 100){
         val request: String = "start_explore"
     }
