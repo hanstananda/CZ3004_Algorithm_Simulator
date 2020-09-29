@@ -116,6 +116,7 @@ Easily reconfigurable:
              [X] [X] [X]
              [X] [X] [X] IRS >
     ```
+    
     Following are the definitions of the sensors:
     * IRS = Infrared Short Range Sensor
     * IRL = Infrared Long Range Sensor
@@ -125,6 +126,7 @@ Easily reconfigurable:
     * IRS_RF = right-facing IRS positioned on the front
     * IRS_RB = right-facing IRS positioned on the back
     * IRL_LF = left-facing IRL positioned on the front
+    
     Following are the available ranges of the robot sensors: 
     * IRS: 1-3 blocks
     * IRL: 1-5 blocks
