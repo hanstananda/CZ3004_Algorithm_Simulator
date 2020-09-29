@@ -38,6 +38,8 @@ object Simulator: ActionListener {
     private var time_chosen = -1
     private var percentage_chosen = 100
     private var speed_chosen = 1
+    private var checked = false
+    private var displayed = false
 
     var real_run = false
 
@@ -51,15 +53,17 @@ object Simulator: ActionListener {
     }
 
     fun displayFrame() {
-        var checked = false
         while (!checked) {
             checked = checkRealRun()
         }
-        if (real_run) {
-            displayMainRealRunFrame()
-        }
-        else {
-            displayMainSimulatorFrame()
+        if(!displayed) {
+            if (real_run) {
+                displayMainRealRunFrame()
+            }
+            else {
+                displayMainSimulatorFrame()
+            }
+            displayed = true
         }
     }
 
