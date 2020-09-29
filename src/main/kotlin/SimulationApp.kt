@@ -135,7 +135,7 @@ class SimulationApp {
             // The command 'help' allows users to get a list of available commands.
             command.startsWith("/help") -> server.help(id)
             command.startsWith("/generate_random_map") -> server.generateRandomMap()
-            command.startsWith("/force_start_exploration") -> server.startExploration()
+            command.startsWith("/force_start_exploration") -> server.sendStartExplorationCommand()
             command.startsWith("/force_start_fastest_path") -> server.startFastestPathWithWaypoint()
             command.startsWith("/force_reset") -> server.resetToInitialServerState()
             // If no commands matched at this point, we notify about it.

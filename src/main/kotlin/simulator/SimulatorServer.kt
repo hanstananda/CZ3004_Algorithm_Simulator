@@ -1,6 +1,7 @@
 package simulator
 
 import com.google.gson.Gson
+import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
 import constants.CommConstants.EXPLORATION_START_COMMAND
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
@@ -13,6 +14,7 @@ import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.COMPLETED_STATUS
+import constants.CommConstants.EXPLORATION_STOP_COMMAND
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
 import constants.MapConstants.DEFAULT_MAP
 import constants.RobotConstants
@@ -22,7 +24,11 @@ import data.map.MazeMap
 import data.robot.Robot
 import data.simulator.ParsedRequest
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import utils.map.RandomMapGenerator
 import utils.map.debugMap
@@ -30,6 +36,7 @@ import utils.map.loadMapFromDisk
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 
 object SimulatorServer {
@@ -100,8 +107,43 @@ object SimulatorServer {
         }
     }
 
-    suspend fun startExploration() {
+    fun handleStartExploration(timeout: Int=-1, coverageLimit: Int=100) {
+        runBlocking {
+            when {
+                coverageLimit!=100 -> {
+                    startExplorationWithCoverage(coverageLimit)
+                }
+                timeout!=-1 -> {
+                    startExplorationWithTimeout(timeout)
+                }
+                else -> {
+                    sendStartExplorationCommand()
+                }
+            }
+        }
+    }
+
+    suspend fun sendStartExplorationCommand() {
         val command = Gson().toJson(EXPLORATION_START_COMMAND)
+        members[latestMember]?.send(Frame.Text(command))
+    }
+
+    private suspend fun startExplorationWithTimeout(timeout: Int) {
+        sendStartExplorationCommand()
+        delay(TimeUnit.SECONDS.toMillis(timeout.toLong()))
+        stopExploration("timeout")
+    }
+
+    private suspend fun startExplorationWithCoverage(coverageLimit: Int) {
+        val startExplorationCommandObject = CommConstants.StartExplorationCommand(coverageLimit)
+        val command = Gson().toJson(startExplorationCommandObject)
+        members[latestMember]?.send(Frame.Text(command))
+    }
+
+    suspend fun stopExploration(reason: String = "force-stop") {
+        val commandMap = HashMap(EXPLORATION_STOP_COMMAND) // copy the basic command
+        commandMap["reason"] = reason
+        val command = Gson().toJson(commandMap)
         members[latestMember]?.send(Frame.Text(command))
     }
 

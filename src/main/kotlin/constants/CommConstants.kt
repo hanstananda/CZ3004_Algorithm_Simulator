@@ -1,5 +1,8 @@
 package constants
 
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+
 object CommConstants {
 
     const val COMMAND = "command" // Total number of columns
@@ -23,5 +26,9 @@ object CommConstants {
     val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
     val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")
     val EXPLORATION_START_COMMAND = mapOf("request" to "start_explore")
+    data class StartExplorationCommand(val coverageLimit: Int = 100){
+        val request: String = "start_explore"
+    }
+    val EXPLORATION_STOP_COMMAND  = mapOf("request" to "stop_explore")
     val FASTEST_PATH_START_COMMAND = mapOf("request" to "start_fastest_path")
 }
