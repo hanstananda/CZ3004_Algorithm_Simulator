@@ -8,10 +8,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import utils.map.loadMapFromDisk
 import java.awt.*
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
+import java.awt.event.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -37,6 +34,8 @@ object Simulator: ActionListener {
     private var waypoint_chosen = Pair(-1, -1) // In form of (x,y)
     private var time_chosen = -1
     private var percentage_chosen = 100
+    private var with_time = false
+    private var with_coverage = false
     private var speed_chosen = 1
     private var checked = false
     private var displayed = false
@@ -190,7 +189,7 @@ object Simulator: ActionListener {
         loadMapButton.actionCommand = "Load Map"
         loadMapButton.addActionListener(this)
         loadMapPanel.add(loadMapButton)
-        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,0,2,1,Insets(30,30,10,30))
+        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,0,2,1,Insets(30,0,10,30))
 
         // Show Map Button
         val showMapPanel = JPanel()
@@ -203,28 +202,56 @@ object Simulator: ActionListener {
         showMapButton.actionCommand = "Display Map"
         showMapButton.addActionListener(this)
         showMapPanel.add(showMapButton)
-        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(30,30,10,30))
+        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(30,0,10,30))
 
         // Exploration Button
-        val exploreButton = JButton("Exploration")
-        exploreButton.isFocusable = false
-        exploreButton.actionCommand = "Exploration"
-        exploreButton.addActionListener(this)
-        addIndivButton(exploreButton,b,buttonLayout,gbc,0,2,2,1,Insets(10,30,10,30))
+        val explorationPanel = JPanel()
+        val explorationBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Exploration ")
+        explorationBorder.titleJustification = TitledBorder.CENTER
+        explorationPanel.border = explorationBorder
+
+        val startButton = JButton("Start")
+        startButton.isFocusable = false
+        startButton.actionCommand = "Start"
+
+        val stopButton = JButton("Stop")
+        stopButton.isFocusable = false
+        stopButton.actionCommand = "Stop"
+
+        val withTime = JCheckBox("Time Limit ")
+        val withCoverage = JCheckBox("Coverage Limit ")
+
+        val explorationLayout = GridBagLayout()
+        explorationPanel.layout = explorationLayout
+
+        addIndivButton(startButton,explorationPanel,explorationLayout,gbc,0,0,1,1,Insets(5,5,5,0))
+        addIndivButton(stopButton,explorationPanel,explorationLayout,gbc,1,0,1,1,Insets(5,25,5,5))
+        addIndivButton(withTime,explorationPanel,explorationLayout,gbc,0,1,1,1,Insets(0,0,0,0))
+        addIndivButton(withCoverage,explorationPanel,explorationLayout,gbc,1,1,1,1,Insets(0,5,0,0))
+
+        startButton.addActionListener(this)
+        stopButton.addActionListener(this)
+        withTime.addItemListener { e ->
+            with_time = e.stateChange == 1
+        }
+        withCoverage.addItemListener { e ->
+            with_coverage = e.stateChange == 1
+        }
+        addIndivButton(explorationPanel,b,buttonLayout,gbc,0,2,2,1,Insets(30,0,10,30))
 
         // Fastest Path Button
         val fastestPathButton = JButton("Fastest Path")
         fastestPathButton.isFocusable = false
         fastestPathButton.actionCommand = "Fastest Path"
         fastestPathButton.addActionListener(this)
-        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,3,2,1,Insets(10,30,10,30))
+        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,3,2,1,Insets(10,0,10,30))
 
         // Reset Robot Button
         val resetButton = JButton("Reset Robot")
         resetButton.isFocusable = false
         resetButton.actionCommand = "Reset Robot"
         resetButton.addActionListener(this)
-        addIndivButton(resetButton,b,buttonLayout,gbc,0,4,2,1,Insets(10,30,10,30))
+        addIndivButton(resetButton,b,buttonLayout,gbc,0,4,2,1,Insets(10,0,10,30))
 
         // Set Speed Slider
         val speedPanel = JPanel()
@@ -249,7 +276,7 @@ object Simulator: ActionListener {
                     }
                 })
         speedPanel.add(speedSlider)
-        addIndivButton(speedPanel,b,buttonLayout,gbc,0,5,2,1,Insets(10,30,10,30))
+        addIndivButton(speedPanel,b,buttonLayout,gbc,0,5,2,1,Insets(10,0,10,30))
 
         // Set Time Limit Button
         val timePanel = JPanel()
@@ -262,11 +289,11 @@ object Simulator: ActionListener {
         timeButton.actionCommand = "Set time limit"
         timeButton.addActionListener(this)
         timePanel.add(timeButton)
-        addIndivButton(timePanel,b,buttonLayout,gbc,0,6,1,1,Insets(10,30,10,0))
+        addIndivButton(timePanel,b,buttonLayout,gbc,0,6,1,1,Insets(10,0,10,0))
 
         // Set Coverage Limit Button
         val coveragePanel = JPanel()
-        val coverageBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Coverage limit (%)  ")
+        val coverageBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"% limit  ")
         coverageBorder.titleJustification = TitledBorder.CENTER
         coveragePanel.border = coverageBorder
         val coverageArr: Array<String?> = createSeqArray(0, 101)
@@ -275,7 +302,7 @@ object Simulator: ActionListener {
         coverageButton.actionCommand = "Set % limit"
         coverageButton.addActionListener(this)
         coveragePanel.add(coverageButton)
-        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,6,1,1,Insets(10,10,10,30))
+        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,6,1,1,Insets(10,0,10,30))
 
         // Set Waypoint Button
         val waypointPanel = JPanel()
@@ -298,7 +325,7 @@ object Simulator: ActionListener {
         waypointPanel.add(waypointRowButton)
         waypointPanel.add(colLabel)
         waypointPanel.add(waypointColButton)
-        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,7,2,1,Insets(10,30,30,30))
+        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,7,2,1,Insets(10,0,30,30))
 
     }
 
@@ -412,9 +439,14 @@ object Simulator: ActionListener {
                 }
             }
         }
-        if (action.contentEquals("Exploration")){
+        if (action.contentEquals("Start")){
             runBlocking {
                 SimulatorServer.startExploration()
+            }
+        }
+        if (action.contentEquals("Stop")){
+            runBlocking {
+//                SimulatorServer.startExploration()
             }
         }
         if (action.contentEquals("Fastest Path")){
