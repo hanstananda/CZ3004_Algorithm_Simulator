@@ -440,13 +440,14 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Start")){
-            runBlocking {
-                SimulatorServer.startExploration()
-            }
+            SimulatorServer.handleStartExploration(
+                timeout = if (with_time) time_chosen else -1,
+                coverageLimit = if (with_coverage) percentage_chosen else 100,
+            )
         }
         if (action.contentEquals("Stop")){
             runBlocking {
-//                SimulatorServer.startExploration()
+                SimulatorServer.stopExploration("Force stop from UI")
             }
         }
         if (action.contentEquals("Fastest Path")){

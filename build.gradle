@@ -8,6 +8,7 @@ group 'cz3004.group28'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'application'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 
