@@ -119,6 +119,7 @@ object SimulatorServer {
                 }
             }
         }
+        Simulator.displayMessage("Exploration started.")
     }
 
     suspend fun startExplorationWithCoverage(coverageLimit: Int = 100) {
@@ -133,6 +134,7 @@ object SimulatorServer {
         val command = Gson().toJson(commandMap)
         members[latestMember]?.send(Frame.Text(command))
         logger.info { "Sent stop exploration with reason $reason" }
+        Simulator.displayMessage("Exploration stopped.")
     }
 
     suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
