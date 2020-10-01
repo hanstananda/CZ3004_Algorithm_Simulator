@@ -130,7 +130,6 @@ object Simulator: ActionListener {
         f.isResizable = false
         f.isFocusable = true
         f.focusTraversalKeysEnabled = false
-        f.background = Color.WHITE
 
         //center main frame
         val dim = Toolkit.getDefaultToolkit().screenSize
@@ -184,7 +183,6 @@ object Simulator: ActionListener {
     private fun addButtons() {
         // Load Map Button
         val loadMapPanel = JPanel()
-//        loadMapPanel.background = Color.WHITE
         val loadMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Load Map ")
         loadMapBorder.titleJustification = TitledBorder.CENTER
         loadMapPanel.border = loadMapBorder
@@ -198,7 +196,6 @@ object Simulator: ActionListener {
 
         // Show Map Button
         val showMapPanel = JPanel()
-//        showMapPanel.background = Color.WHITE
         val showMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Display Map ")
         showMapBorder.titleJustification = TitledBorder.CENTER
         showMapPanel.border = showMapBorder
@@ -212,7 +209,6 @@ object Simulator: ActionListener {
 
         // Exploration Button
         val explorationPanel = JPanel()
-//        explorationPanel.background = Color.WHITE
         val explorationBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Exploration ")
         explorationBorder.titleJustification = TitledBorder.CENTER
         explorationPanel.border = explorationBorder
@@ -262,7 +258,6 @@ object Simulator: ActionListener {
 
         // Set Speed Slider
         val speedPanel = JPanel()
-//        speedPanel.background = Color.WHITE
         val speedBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Robot Speed (step/s) ")
         speedBorder.titleJustification = TitledBorder.CENTER
         speedPanel.border = speedBorder
@@ -288,7 +283,6 @@ object Simulator: ActionListener {
 
         // Set Time Limit Button
         val timePanel = JPanel()
-//        timePanel.background = Color.WHITE
         val timeBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Time limit (s) ")
         timeBorder.titleJustification = TitledBorder.CENTER
         timePanel.border = timeBorder
@@ -302,7 +296,6 @@ object Simulator: ActionListener {
 
         // Set Coverage Limit Button
         val coveragePanel = JPanel()
-//        coveragePanel.background = Color.WHITE
         val coverageBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"% limit  ")
         coverageBorder.titleJustification = TitledBorder.CENTER
         coveragePanel.border = coverageBorder
@@ -316,7 +309,6 @@ object Simulator: ActionListener {
 
         // Set Waypoint Button
         val waypointPanel = JPanel()
-//        waypointPanel.background = Color.WHITE
         val waypointBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Waypoint ")
         waypointBorder.titleJustification = TitledBorder.CENTER
         waypointPanel.border = waypointBorder
