@@ -3,6 +3,7 @@ package simulator
 import com.google.gson.Gson
 import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
+import constants.CommConstants.COMPLETED_STATUS
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
@@ -12,8 +13,10 @@ import constants.CommConstants.MOVEMENT_COMMAND
 import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
-import constants.CommConstants.COMPLETED_STATUS
+import constants.CommConstants.COMPLETED_STATUS_MAP
 import constants.CommConstants.EXPLORATION_STOP_COMMAND
+import constants.CommConstants.MOVING_STATUS
+import constants.CommConstants.ROTATING_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
 import constants.MapConstants.DEFAULT_MAP
 import constants.RobotConstants
@@ -152,12 +155,39 @@ object SimulatorServer {
             Gson().fromJson(message, ParsedRequest::class.java)
 
         // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
+        val status: String? = request.status
         val commandType: String? = request.command
         val obstacleDetect: Array<Int>? = request.obstacleDetect
         val imageDetect: Array<Int>? = request.imageDetect
         val exploredDetect: Array<Array<Int>>? = request.exploredDetect
         val response: String
         when {
+            status != null -> {
+                when(status) {
+                    MOVING_STATUS -> {
+                        val units:Int = request.delta!!.toInt()
+                        for (unit in 1..units) {
+                            robot.move(RobotConstants.MOVEMENT.FORWARD)
+                        }
+                    }
+                    ROTATING_STATUS -> {
+                        val delta:Int = request.delta!!.toInt()
+                        if(delta<0) {
+                            for (unit in 1..( (-delta) / 90)) {
+                                robot.move(RobotConstants.MOVEMENT.LEFT)
+                            }
+                        }
+                        else {
+                            for (unit in 1..(delta / 90)) {
+                                robot.move(RobotConstants.MOVEMENT.RIGHT)
+                            }
+                        }
+                    }
+                    COMPLETED_STATUS -> {
+                    }
+                }
+                response = Gson().toJson(COMPLETED_STATUS_MAP)
+            }
             obstacleDetect != null -> {
                 val (xPos, yPos) = obstacleDetect
                 logger.info { "Received obstacle info at ($xPos, $yPos) " }
@@ -198,14 +228,14 @@ object SimulatorServer {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.FORWARD)
                         }
-                        response = Gson().toJson(COMPLETED_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS_MAP)
                         sendSensorTelemetry(sender)
                     }
                     BACKWARD_COMMAND -> {
                         for (unit in 1..units) {
                             robot.move(RobotConstants.MOVEMENT.BACKWARD)
                         }
-                        response = Gson().toJson(COMPLETED_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS_MAP)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
@@ -220,14 +250,14 @@ object SimulatorServer {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.RIGHT)
                         }
-                        response = Gson().toJson(COMPLETED_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS_MAP)
                         sendSensorTelemetry(sender)
                     }
                     LEFT_COMMAND -> {
                         for (unit in 1..(angle / 90)) {
                             robot.move(RobotConstants.MOVEMENT.LEFT)
                         }
-                        response = Gson().toJson(COMPLETED_STATUS)
+                        response = Gson().toJson(COMPLETED_STATUS_MAP)
                         sendSensorTelemetry(sender)
                     }
                     else -> {
