@@ -42,6 +42,9 @@ object Simulator: ActionListener {
     private var checked = false
     private var displayed = false
 
+    lateinit var message: JTextArea
+    lateinit var scrollPane: JScrollPane
+
     var real_run = false
 
     @JvmStatic
@@ -94,7 +97,7 @@ object Simulator: ActionListener {
     fun displayMainSimulatorFrame() {
         //initialise main frame
         f = JFrame("MDP Group 28 Simulator")
-        f.size = Dimension(1000, 700)
+        f.size = Dimension(1100, 700)
         f.isResizable = false
         f.isFocusable = true
         f.focusTraversalKeysEnabled = false;
@@ -109,7 +112,6 @@ object Simulator: ActionListener {
 
         //create JPanel for buttons
         b = JPanel()
-//        b.background = Color.WHITE
 
         //add m & b to the main frame's content pane
         val contentPane = f.contentPane
@@ -188,7 +190,7 @@ object Simulator: ActionListener {
         randomMapButton.isFocusable = false
         randomMapButton.actionCommand = "Generate Random Map"
         randomMapButton.addActionListener(this)
-        addIndivButton(randomMapButton,b,buttonLayout,gbc,0,0,2,1,Insets(40,40,10,40))
+        addIndivButton(randomMapButton,b,buttonLayout,gbc,0,0,2,1,Insets(10,40,10,40))
 
 
         // Load Map Button
@@ -202,7 +204,7 @@ object Simulator: ActionListener {
         loadMapButton.actionCommand = "Load Map"
         loadMapButton.addActionListener(this)
         loadMapPanel.add(loadMapButton)
-        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(5,40,10,40))
+        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,1,1,1,Insets(5,40,10,5))
 
         // Show Map Button
         val showMapPanel = JPanel()
@@ -215,7 +217,7 @@ object Simulator: ActionListener {
         showMapButton.actionCommand = "Display Map"
         showMapButton.addActionListener(this)
         showMapPanel.add(showMapButton)
-        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,2,2,1,Insets(5,40,10,40))
+        addIndivButton(showMapPanel,b,buttonLayout,gbc,1,1,1,1,Insets(5,5,10,40))
 
         // Exploration Button
         val explorationPanel = JPanel()
@@ -233,16 +235,21 @@ object Simulator: ActionListener {
 
         val withTime = JCheckBox("Time Limit ")
         val withCoverage = JCheckBox("Coverage Limit ")
-        val withImageRec = JCheckBox("Image Recognition ")
+        val withImageRec = JCheckBox("Image Rec")
 
         val explorationLayout = GridBagLayout()
         explorationPanel.layout = explorationLayout
 
-        addIndivButton(startButton,explorationPanel,explorationLayout,gbc,0,0,1,1,Insets(5,15,5,0))
-        addIndivButton(stopButton,explorationPanel,explorationLayout,gbc,1,0,1,1,Insets(5,25,5,15))
+        val startStopPanel = JPanel()
+        val startStopLayout = GridBagLayout()
+        startStopPanel.layout = startStopLayout
+        addIndivButton(startButton,startStopPanel,startStopLayout,gbc,0,0,1,1,Insets(0,40,0,20))
+        addIndivButton(stopButton,startStopPanel,startStopLayout,gbc,1,0,1,1,Insets(0,20,0,40))
+
+        addIndivButton(startStopPanel,explorationPanel,explorationLayout,gbc,0,0,3,1,Insets(0,0,0,0))
         addIndivButton(withTime,explorationPanel,explorationLayout,gbc,0,1,1,1,Insets(0,0,0,0))
-        addIndivButton(withCoverage,explorationPanel,explorationLayout,gbc,1,1,1,1,Insets(0,5,0,0))
-        addIndivButton(withImageRec,explorationPanel,explorationLayout,gbc,0,2,2,1,Insets(5,0,5,15))
+        addIndivButton(withCoverage,explorationPanel,explorationLayout,gbc,1,1,1,1,Insets(0,0,0,0))
+        addIndivButton(withImageRec,explorationPanel,explorationLayout,gbc,2,1,1,1,Insets(0,0,0,0))
 
         startButton.addActionListener(this)
         stopButton.addActionListener(this)
@@ -255,21 +262,21 @@ object Simulator: ActionListener {
         withImageRec.addItemListener { e ->
             with_image_rec = e.stateChange == 1
         }
-        addIndivButton(explorationPanel,b,buttonLayout,gbc,0,3,2,1,Insets(5,40,10,40))
+        addIndivButton(explorationPanel,b,buttonLayout,gbc,0,2,2,1,Insets(5,40,10,40))
 
         // Fastest Path Button
         val fastestPathButton = JButton("Fastest Path")
         fastestPathButton.isFocusable = false
         fastestPathButton.actionCommand = "Fastest Path"
         fastestPathButton.addActionListener(this)
-        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,4,2,1,Insets(5,40,10,40))
+        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,3,1,1,Insets(5,40,10,5))
 
         // Reset Robot Button
         val resetButton = JButton("Reset Robot")
         resetButton.isFocusable = false
         resetButton.actionCommand = "Reset Robot"
         resetButton.addActionListener(this)
-        addIndivButton(resetButton,b,buttonLayout,gbc,0,5,2,1,Insets(5,40,10,40))
+        addIndivButton(resetButton,b,buttonLayout,gbc,1,3,1,1,Insets(5,5,10,40))
 
         // Set Speed Slider
         val speedPanel = JPanel()
@@ -294,7 +301,7 @@ object Simulator: ActionListener {
                     }
                 })
         speedPanel.add(speedSlider)
-        addIndivButton(speedPanel,b,buttonLayout,gbc,0,6,2,1,Insets(5,40,10,40))
+        addIndivButton(speedPanel,b,buttonLayout,gbc,0,4,2,1,Insets(5,40,10,40))
 
         // Set Time Limit Button
         val timePanel = JPanel()
@@ -307,7 +314,7 @@ object Simulator: ActionListener {
         timeButton.actionCommand = "Set time limit"
         timeButton.addActionListener(this)
         timePanel.add(timeButton)
-        addIndivButton(timePanel,b,buttonLayout,gbc,0,7,1,1,Insets(5,40,10,0))
+        addIndivButton(timePanel,b,buttonLayout,gbc,0,5,1,1,Insets(5,40,10,0))
 
         // Set Coverage Limit Button
         val coveragePanel = JPanel()
@@ -320,7 +327,7 @@ object Simulator: ActionListener {
         coverageButton.actionCommand = "Set % limit"
         coverageButton.addActionListener(this)
         coveragePanel.add(coverageButton)
-        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,7,1,1,Insets(5,5,10,40))
+        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,5,1,1,Insets(5,5,10,40))
 
         // Set Waypoint Button
         val waypointPanel = JPanel()
@@ -343,8 +350,61 @@ object Simulator: ActionListener {
         waypointPanel.add(waypointRowButton)
         waypointPanel.add(colLabel)
         waypointPanel.add(waypointColButton)
-        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,8,2,1,Insets(5,40,30,40))
+        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,6,2,1,Insets(5,40,10,40))
 
+        // Set Console Log
+        val consolePanel = JPanel()
+        val consoleBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),"Console Log ")
+        consolePanel.border = consoleBorder
+        message = JTextArea("\n".repeat(7) + "Initialising the User Interface.")
+        message.background = Color.WHITE
+        message.isEditable = false
+        message.lineWrap = true
+        message.wrapStyleWord = true
+        scrollPane = JScrollPane(message)
+        scrollPane.isFocusable = false
+
+//		scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+//	        public void adjustmentValueChanged(AdjustmentEvent e) {
+//	            e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+//
+//	        }
+//	    });
+//
+        scrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+        consolePanel.layout = BorderLayout()
+        consolePanel.add(scrollPane, BorderLayout.CENTER)
+        addIndivButton(consolePanel,b,buttonLayout,gbc,0,7,2,2,Insets(5,40,10,40))
+
+
+    }
+
+    fun displayMessage(s: String) {
+        val vbar: JScrollBar = scrollPane.verticalScrollBar
+        message.append("\n")
+        message.append("""$s""".trimIndent())
+        try {
+            val messageText = message.document.getText(0, message.document.length)
+            if (messageText[0] == '\n') {
+                message.text = message.document.getText(0, message.document.length)
+                    .replaceFirst("\n".toRegex(), "")
+            }
+            val arr = messageText.split("\n").toTypedArray()
+            if (arr.size > 100) {
+                message.text = message.document.getText(0, message.document.length)
+                    .replaceFirst(arr[0] + "\n".toRegex(), "")
+            }
+        } catch (e: java.lang.Exception) {
+            logger.debug { "Error in displayMessage" }
+        }
+        vbar.addAdjustmentListener(object : AdjustmentListener {
+            override fun adjustmentValueChanged(e: AdjustmentEvent) {
+                val adjustable = e.adjustable
+                adjustable.value = adjustable.maximum
+                // to allow user to scroll down
+                vbar.removeAdjustmentListener(this)
+            }
+        })
     }
 
     private fun initMovementButtons() {
@@ -418,6 +478,7 @@ object Simulator: ActionListener {
             SimulatorServer.resetExploredMapAndRobot()
             sim.map= SimulatorServer.trueMap
             updateSimulatorMap()
+            displayMessage("$selectedFileString loaded.")
         } catch (f: FileNotFoundException) {
             logger.debug{"File not found"}
         } catch (IO: IOException) {
@@ -436,6 +497,7 @@ object Simulator: ActionListener {
             SimulatorServer.resetExploredMapAndRobot()
             sim.map= SimulatorServer.trueMap
             updateSimulatorMap()
+            displayMessage("Random map loaded.")
         }
         if (action!!.contentEquals("Load Map")) {
             val arenaMap = e.source as JComboBox<*>
