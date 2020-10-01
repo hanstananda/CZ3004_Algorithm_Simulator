@@ -5,6 +5,11 @@ import java.io.Serializable
 
 object CommConstants {
 
+    const val STATUS_REQUEST = "status"
+    const val MOVING_STATUS = "moving"
+    const val ROTATING_STATUS = "rotating"
+    const val COMPLETED_STATUS = "completed"
+    const val DELTA_REQUEST = "delta"
     const val COMMAND = "command" // Total number of columns
     const val FORWARD_COMMAND = "move_front"
     const val BACKWARD_COMMAND = "move_back"
@@ -19,9 +24,9 @@ object CommConstants {
 
     const val SENSOR_READ_COMMAND = "sensor_read"
 
-    val MOVING_STATUS = mapOf("status" to "moving")
-    val ROTATING_STATUS = mapOf("status" to "rotating")
-    val COMPLETED_STATUS = mapOf("status" to "completed")
+    val MOVING_STATUS_MAP = mapOf("status" to MOVING_STATUS)
+    val ROTATING_STATUS_MAP = mapOf("status" to ROTATING_STATUS)
+    val COMPLETED_STATUS_MAP = mapOf("status" to COMPLETED_STATUS)
     val FINISHED_COMMAND = mapOf("status" to "Command executed!")
     val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
     val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")

@@ -2,11 +2,19 @@ package data.simulator
 
 import com.google.gson.annotations.SerializedName
 import constants.CommConstants.COMMAND
+import constants.CommConstants.DELTA_REQUEST
 import constants.CommConstants.EXPLORED_DETECT_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
 import constants.CommConstants.OBSTACLE_DETECT_COMMAND
+import constants.CommConstants.STATUS_REQUEST
 
 data class ParsedRequest(
+
+    @SerializedName(STATUS_REQUEST)
+    val status: String?,
+
+    @SerializedName(DELTA_REQUEST)
+    val delta: String?,
 
     @SerializedName(COMMAND)
     val command: String?,
