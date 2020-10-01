@@ -6,6 +6,7 @@ import data.map.MazeMap
 import data.robot.Robot
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import utils.map.RandomMapGenerator
 import utils.map.loadMapFromDisk
 import java.awt.*
 import java.awt.event.*
@@ -36,6 +37,7 @@ object Simulator: ActionListener {
     private var percentage_chosen = 100
     private var with_time = false
     private var with_coverage = false
+    private var with_image_rec = false
     private var speed_chosen = 1
     private var checked = false
     private var displayed = false
@@ -181,6 +183,14 @@ object Simulator: ActionListener {
     }
 
     private fun addButtons() {
+        // Generate Random Map Button
+        val randomMapButton = JButton("Generate Random Map")
+        randomMapButton.isFocusable = false
+        randomMapButton.actionCommand = "Generate Random Map"
+        randomMapButton.addActionListener(this)
+        addIndivButton(randomMapButton,b,buttonLayout,gbc,0,0,2,1,Insets(40,40,10,40))
+
+
         // Load Map Button
         val loadMapPanel = JPanel()
         val loadMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Load Map ")
@@ -192,7 +202,7 @@ object Simulator: ActionListener {
         loadMapButton.actionCommand = "Load Map"
         loadMapButton.addActionListener(this)
         loadMapPanel.add(loadMapButton)
-        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,0,2,1,Insets(30,40,10,40))
+        addIndivButton(loadMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(5,40,10,40))
 
         // Show Map Button
         val showMapPanel = JPanel()
@@ -205,7 +215,7 @@ object Simulator: ActionListener {
         showMapButton.actionCommand = "Display Map"
         showMapButton.addActionListener(this)
         showMapPanel.add(showMapButton)
-        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,1,2,1,Insets(30,40,10,40))
+        addIndivButton(showMapPanel,b,buttonLayout,gbc,0,2,2,1,Insets(5,40,10,40))
 
         // Exploration Button
         val explorationPanel = JPanel()
@@ -223,6 +233,7 @@ object Simulator: ActionListener {
 
         val withTime = JCheckBox("Time Limit ")
         val withCoverage = JCheckBox("Coverage Limit ")
+        val withImageRec = JCheckBox("Image Recognition ")
 
         val explorationLayout = GridBagLayout()
         explorationPanel.layout = explorationLayout
@@ -231,6 +242,7 @@ object Simulator: ActionListener {
         addIndivButton(stopButton,explorationPanel,explorationLayout,gbc,1,0,1,1,Insets(5,25,5,15))
         addIndivButton(withTime,explorationPanel,explorationLayout,gbc,0,1,1,1,Insets(0,0,0,0))
         addIndivButton(withCoverage,explorationPanel,explorationLayout,gbc,1,1,1,1,Insets(0,5,0,0))
+        addIndivButton(withImageRec,explorationPanel,explorationLayout,gbc,0,2,2,1,Insets(5,0,5,15))
 
         startButton.addActionListener(this)
         stopButton.addActionListener(this)
@@ -240,21 +252,24 @@ object Simulator: ActionListener {
         withCoverage.addItemListener { e ->
             with_coverage = e.stateChange == 1
         }
-        addIndivButton(explorationPanel,b,buttonLayout,gbc,0,2,2,1,Insets(30,40,10,40))
+        withImageRec.addItemListener { e ->
+            with_image_rec = e.stateChange == 1
+        }
+        addIndivButton(explorationPanel,b,buttonLayout,gbc,0,3,2,1,Insets(5,40,10,40))
 
         // Fastest Path Button
         val fastestPathButton = JButton("Fastest Path")
         fastestPathButton.isFocusable = false
         fastestPathButton.actionCommand = "Fastest Path"
         fastestPathButton.addActionListener(this)
-        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,3,2,1,Insets(10,40,10,40))
+        addIndivButton(fastestPathButton,b,buttonLayout,gbc,0,4,2,1,Insets(5,40,10,40))
 
         // Reset Robot Button
         val resetButton = JButton("Reset Robot")
         resetButton.isFocusable = false
         resetButton.actionCommand = "Reset Robot"
         resetButton.addActionListener(this)
-        addIndivButton(resetButton,b,buttonLayout,gbc,0,4,2,1,Insets(10,40,10,40))
+        addIndivButton(resetButton,b,buttonLayout,gbc,0,5,2,1,Insets(5,40,10,40))
 
         // Set Speed Slider
         val speedPanel = JPanel()
@@ -279,7 +294,7 @@ object Simulator: ActionListener {
                     }
                 })
         speedPanel.add(speedSlider)
-        addIndivButton(speedPanel,b,buttonLayout,gbc,0,5,2,1,Insets(10,40,10,40))
+        addIndivButton(speedPanel,b,buttonLayout,gbc,0,6,2,1,Insets(5,40,10,40))
 
         // Set Time Limit Button
         val timePanel = JPanel()
@@ -292,7 +307,7 @@ object Simulator: ActionListener {
         timeButton.actionCommand = "Set time limit"
         timeButton.addActionListener(this)
         timePanel.add(timeButton)
-        addIndivButton(timePanel,b,buttonLayout,gbc,0,6,1,1,Insets(10,40,10,0))
+        addIndivButton(timePanel,b,buttonLayout,gbc,0,7,1,1,Insets(5,40,10,0))
 
         // Set Coverage Limit Button
         val coveragePanel = JPanel()
@@ -305,7 +320,7 @@ object Simulator: ActionListener {
         coverageButton.actionCommand = "Set % limit"
         coverageButton.addActionListener(this)
         coveragePanel.add(coverageButton)
-        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,6,1,1,Insets(10,5,10,40))
+        addIndivButton(coveragePanel,b,buttonLayout,gbc,1,7,1,1,Insets(5,5,10,40))
 
         // Set Waypoint Button
         val waypointPanel = JPanel()
@@ -328,7 +343,7 @@ object Simulator: ActionListener {
         waypointPanel.add(waypointRowButton)
         waypointPanel.add(colLabel)
         waypointPanel.add(waypointColButton)
-        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,7,2,1,Insets(10,40,30,40))
+        addIndivButton(waypointPanel,b,buttonLayout,gbc,0,8,2,1,Insets(5,40,30,40))
 
     }
 
@@ -402,8 +417,6 @@ object Simulator: ActionListener {
             SimulatorServer.trueMap = newMap
             SimulatorServer.resetExploredMapAndRobot()
             sim.map= SimulatorServer.trueMap
-            val cl = m.layout as CardLayout
-            cl.show(m, "map")
             updateSimulatorMap()
         } catch (f: FileNotFoundException) {
             logger.debug{"File not found"}
@@ -416,6 +429,14 @@ object Simulator: ActionListener {
 
     override fun actionPerformed(e: ActionEvent?) {
         val action = e!!.actionCommand
+        if (action!!.contentEquals("Generate Random Map")) {
+            var randomMap = RandomMapGenerator.createValidatedRandomMazeMap()
+            randomMap.setAllExplored()
+            SimulatorServer.trueMap = randomMap
+            SimulatorServer.resetExploredMapAndRobot()
+            sim.map= SimulatorServer.trueMap
+            updateSimulatorMap()
+        }
         if (action!!.contentEquals("Load Map")) {
             val arenaMap = e.source as JComboBox<*>
             val selectedFileString = arenaMap.selectedItem as String
