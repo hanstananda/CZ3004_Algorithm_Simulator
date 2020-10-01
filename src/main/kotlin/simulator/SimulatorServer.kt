@@ -155,7 +155,7 @@ object SimulatorServer {
         val commandType: String? = request.command
         val obstacleDetect: Array<Int>? = request.obstacleDetect
         val imageDetect: Array<Int>? = request.imageDetect
-        val exploredInfo: Array<Int>? = request.exploredInfo
+        val exploredDetect: Array<Array<Int>>? = request.exploredDetect
         val response: String
         when {
             obstacleDetect != null -> {
@@ -170,13 +170,15 @@ object SimulatorServer {
 //                Simulator.sim.map = realTimeMap
 //                debugMap(realTimeMap, robot)
             }
-            exploredInfo != null -> {
-                val (xPos, yPos) = exploredInfo
-                logger.info { "Received explored info at ($xPos, $yPos) " }
-                if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
-                    realTimeMap.grid[yPos][xPos].explored = true
-                } else {
-                    logger.warn { "received coordinate is invalid!" }
+            exploredDetect != null -> {
+                for(pos in exploredDetect) {
+                    val (xPos, yPos) = pos
+                    logger.info { "Received explored info at ($xPos, $yPos) " }
+                    if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                        realTimeMap.grid[yPos][xPos].explored = true
+                    } else {
+                        logger.warn { "received coordinate is invalid!" }
+                    }
                 }
                 response = Gson().toJson(FINISHED_COMMAND)
 //                Simulator.sim.map = realTimeMap
