@@ -14,7 +14,7 @@ object CommConstants {
     const val ROTATE_COMMAND = "rotate"
     const val IMAGE_COMMAND = "image_detect"
     const val OBSTACLE_DETECT_COMMAND = "obstacle_detect"
-    const val EXPLORED_COMMAND = "explored"
+    const val EXPLORED_DETECT_COMMAND = "explored_detect"
     const val LOAD_TEST_MAP_COMMAND = "load_test_map"
 
     const val SENSOR_READ_COMMAND = "sensor_read"
