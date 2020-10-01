@@ -166,8 +166,15 @@ object SimulatorServer {
                 when(status) {
                     MOVING_STATUS -> {
                         val units:Int = request.delta!!.toInt()
-                        for (unit in 1..units) {
-                            robot.move(RobotConstants.MOVEMENT.FORWARD)
+                        if (units<0) {
+                            for (unit in 1..-units) {
+                                robot.move(RobotConstants.MOVEMENT.BACKWARD)
+                            }
+                        }
+                        else {
+                            for (unit in 1..units) {
+                                robot.move(RobotConstants.MOVEMENT.FORWARD)
+                            }
                         }
                     }
                     ROTATING_STATUS -> {
