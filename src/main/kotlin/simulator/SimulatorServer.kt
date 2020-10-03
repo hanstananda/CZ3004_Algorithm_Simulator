@@ -3,6 +3,7 @@ package simulator
 import com.google.gson.Gson
 import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
+import constants.CommConstants.CALIBRATE_COMMAND
 import constants.CommConstants.COMPLETED_STATUS
 import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FINISHED_COMMAND
@@ -195,7 +196,7 @@ object SimulatorServer {
                     COMPLETED_STATUS -> {
                     }
                 }
-                response = Gson().toJson(COMPLETED_STATUS_MAP)
+                response = ""
             }
             obstacleDetect != null -> {
                 val (xPos, yPos) = obstacleDetect
@@ -205,7 +206,7 @@ object SimulatorServer {
                 } else {
                     logger.warn { "received coordinate is invalid!" }
                 }
-                response = Gson().toJson(FINISHED_COMMAND)
+                response = ""
 //                Simulator.sim.map = realTimeMap
 //                debugMap(realTimeMap, robot)
             }
@@ -219,16 +220,20 @@ object SimulatorServer {
                         logger.warn { "received coordinate is invalid!" }
                     }
                 }
-                response = Gson().toJson(FINISHED_COMMAND)
+                response = ""
 //                Simulator.sim.map = realTimeMap
 //                debugMap(realTimeMap, robot)
             }
             imageDetect != null -> {
                 logger.info { imageDetect }
-                response = Gson().toJson(FINISHED_COMMAND)
+                response = ""
             }
             commandType == null -> {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
+            }
+            commandType.startsWith(CALIBRATE_COMMAND) -> {
+                sendSensorTelemetry(sender)
+                response = Gson().toJson(FINISHED_COMMAND)
             }
             commandType.startsWith(MOVEMENT_COMMAND) -> {
                 val units = (request.unit ?: "1").toInt()
@@ -283,7 +288,9 @@ object SimulatorServer {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
             }
         }
-        members[sender]?.send(Frame.Text(response))
+        if(response!="") {
+            members[sender]?.send(Frame.Text(response))
+        }
         updateSimulationUI()
     }
 
@@ -327,13 +334,13 @@ object SimulatorServer {
 
     fun resetToInitialServerState() {
         resetExploredMapAndRobot()
-        resetRealTimeMap()
         loadMapFromDisk(trueMap, DEFAULT_MAP)
         trueMap.setAllExplored()
         updateSimulationUI()
     }
 
     fun resetExploredMapAndRobot() {
+        resetRealTimeMap()
         exploredMap = MazeMap()
         robot.resetRobot()
         robot.simulateSensors(exploredMap, trueMap)
