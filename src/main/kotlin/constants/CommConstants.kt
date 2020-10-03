@@ -12,7 +12,7 @@ object CommConstants {
     const val DELTA_REQUEST = "delta"
     const val COMMAND = "command" // Total number of columns
     const val FORWARD_COMMAND = "move_front"
-    const val BACKWARD_COMMAND = "move_back"
+    const val BACKWARD_COMMAND = "move_backward"
     const val RIGHT_COMMAND = "rotate_right"
     const val LEFT_COMMAND = "rotate_left"
     const val MOVEMENT_COMMAND = "move"
