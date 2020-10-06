@@ -158,15 +158,11 @@ object SimulatorServer {
             Gson().fromJson(message, ParsedRequest::class.java)
 
         // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
-        val status: String? = request.status
         val commandType: String? = request.command
-        val obstacleDetect: Array<Int>? = request.obstacleDetect
-        val imageDetect: Array<Int>? = request.imageDetect
-        val exploredDetect: Array<Array<Int>>? = request.exploredDetect
         val response: String
         when {
-            status != null -> {
-                when(status) {
+            request.status != null -> {
+                when(request.status) {
                     MOVING_STATUS -> {
                         val units:Int = request.delta!!.toInt()
                         if (units<0) {
@@ -198,8 +194,14 @@ object SimulatorServer {
                 }
                 response = ""
             }
-            obstacleDetect != null -> {
-                val (xPos, yPos) = obstacleDetect
+            request.mapDetect1 != null -> {
+                val logMsg = "MDF String received! String is ${request.mapDetect1}, ${request.mapDetect2}"
+                logger.info { logMsg }
+                Simulator.displayMessage(logMsg)
+                response = ""
+            }
+            request.obstacleDetect != null -> {
+                val (xPos, yPos) = request.obstacleDetect
                 logger.info { "Received obstacle info at ($xPos, $yPos) " }
                 if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
                     realTimeMap.setObstacle(yPos, xPos, true)
@@ -210,8 +212,8 @@ object SimulatorServer {
 //                Simulator.sim.map = realTimeMap
 //                debugMap(realTimeMap, robot)
             }
-            exploredDetect != null -> {
-                for(pos in exploredDetect) {
+            request.exploredDetect != null -> {
+                for(pos in request.exploredDetect) {
                     val (xPos, yPos) = pos
                     logger.info { "Received explored info at ($xPos, $yPos) " }
                     if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
@@ -224,8 +226,11 @@ object SimulatorServer {
 //                Simulator.sim.map = realTimeMap
 //                debugMap(realTimeMap, robot)
             }
-            imageDetect != null -> {
-                logger.info { imageDetect }
+            request.imageDetect != null -> {
+                val (id: Int, xPos: Int, yPos: Int) = request.imageDetect
+                val logMsg = "Image $id detected at ($xPos, $yPos)!"
+                logger.info { logMsg }
+                Simulator.displayMessage(logMsg)
                 response = ""
             }
             commandType == null -> {

@@ -5,6 +5,8 @@ import constants.CommConstants.COMMAND
 import constants.CommConstants.DELTA_REQUEST
 import constants.CommConstants.EXPLORED_DETECT_COMMAND
 import constants.CommConstants.IMAGE_COMMAND
+import constants.CommConstants.MAP_DETECT_1
+import constants.CommConstants.MAP_DETECT_2
 import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.STATUS_REQUEST
 
@@ -24,6 +26,12 @@ data class ParsedRequest(
 
     @SerializedName(EXPLORED_DETECT_COMMAND)
     val exploredDetect: Array<Array<Int>>?,
+
+    @SerializedName(MAP_DETECT_1)
+    val mapDetect1: String?,
+
+    @SerializedName(MAP_DETECT_2)
+    val mapDetect2: String?,
 
     @SerializedName(IMAGE_COMMAND)
     val imageDetect: Array<Int>?,
