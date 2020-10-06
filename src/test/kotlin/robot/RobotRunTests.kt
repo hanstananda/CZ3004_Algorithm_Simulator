@@ -320,7 +320,7 @@ class RobotRunTests {
             Assertions.assertTrue(exploredMap.grid[robot.row+2][robot.col].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row+3][robot.col].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row+2][robot.col+1].explored)
-            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col-4].explored)
+            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col-4].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col+2].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col+3].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+2].explored)
@@ -344,8 +344,7 @@ class RobotRunTests {
             Assertions.assertTrue(exploredMap.grid[obstacleRow][obstacleCol].obstacle)
             Assertions.assertTrue(exploredMap.grid[robot.row-2][robot.col-1].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row-3][robot.col-1].explored)
-            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+4].explored)
-            Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col+5].obstacle)
+            Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col+4].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row+1][robot.col-2].explored)
             Assertions.assertTrue(exploredMap.grid[robot.row-1][robot.col-2].explored)
         }

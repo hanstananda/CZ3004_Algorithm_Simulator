@@ -19,9 +19,9 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
      *
      *         ^   ^   ^
      *        IRS IRS IRS
-     *   <IRL [X] [X] [X] IRS >
-     *        [X] [X] [X]
      *        [X] [X] [X] IRS >
+     *        [X] [X] [X]
+     *   <IRL [X] [X] [X] IRS >
      *
      * IRS = Infrared Short Range Sensor, IRL = Infrared Long Range Sensor
      * IRS_FL = front-facing IRS positioned on the left
@@ -29,7 +29,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
      * IRS_FR = front-facing IRS positioned on the right
      * IRS_RF = right-facing IRS positioned on the front
      * IRS_RB = right-facing IRS positioned on the back
-     * IRL_LF = left-facing IRL positioned on the front
+     * IRL_LF = left-facing IRL positioned on the front (update: moved to the back, but code still same)
      *
      * @author Hans Tananda
      */
@@ -67,7 +67,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
         // IR Long Range L
         Sensor(
             RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H,
-            row + 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT), "IRL_LF"
+            row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT), "IRL_LF"
         )
     )
 
@@ -83,7 +83,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
                 sensors[3].setSensor(row + 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
                 sensors[4].setSensor(row - 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row + 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
+                sensors[5].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
             }
             RobotConstants.DIRECTION.SOUTH -> {
                 sensors[0].setSensor(row - 1, col + 1, robotDir)
@@ -93,7 +93,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
                 sensors[3].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
                 sensors[4].setSensor(row + 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row - 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
+                sensors[5].setSensor(row + 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
             }
             RobotConstants.DIRECTION.EAST -> {
                 sensors[0].setSensor(row + 1, col + 1, robotDir)
@@ -103,7 +103,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
                 sensors[3].setSensor(row - 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
                 sensors[4].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row + 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
+                sensors[5].setSensor(row + 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
 
             }
             RobotConstants.DIRECTION.WEST -> {
@@ -114,7 +114,7 @@ data class Robot(var startRow: Int, var startCol: Int) : JPanel() {
                 sensors[3].setSensor(row + 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
                 sensors[4].setSensor(row + 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.RIGHT))
 
-                sensors[5].setSensor(row - 1, col - 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
+                sensors[5].setSensor(row - 1, col + 1, findNewDirection(RobotConstants.MOVEMENT.LEFT))
 
 
             }
