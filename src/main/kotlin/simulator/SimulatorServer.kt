@@ -238,7 +238,7 @@ object SimulatorServer {
             }
             commandType.startsWith(CALIBRATE_COMMAND) -> {
                 sendSensorTelemetry(sender)
-                response = Gson().toJson(FINISHED_COMMAND)
+                response = Gson().toJson(COMPLETED_STATUS_MAP)
             }
             commandType.startsWith(MOVEMENT_COMMAND) -> {
                 val units = (request.unit ?: "1").toInt()
