@@ -22,6 +22,8 @@ object CommConstants {
     const val EXPLORED_DETECT_COMMAND = "explored_detect"
     const val LOAD_TEST_MAP_COMMAND = "load_test_map"
     const val CALIBRATE_COMMAND = "calibrate"
+    const val MAP_DETECT_1 = "map_detect_1"
+    const val MAP_DETECT_2 = "map_detect_2"
 
     const val SENSOR_READ_COMMAND = "sensor_read"
 
