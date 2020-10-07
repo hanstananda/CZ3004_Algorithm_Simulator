@@ -38,4 +38,7 @@ object CommConstants {
     }
     val EXPLORATION_STOP_COMMAND  = mapOf("request" to "stop_explore")
     val FASTEST_PATH_START_COMMAND = mapOf("request" to "start_fastest_path")
+
+    const val UPDATE_REQUEST = "update"
+
 }

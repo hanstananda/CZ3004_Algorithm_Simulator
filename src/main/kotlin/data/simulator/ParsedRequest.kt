@@ -9,6 +9,7 @@ import constants.CommConstants.MAP_DETECT_1
 import constants.CommConstants.MAP_DETECT_2
 import constants.CommConstants.OBSTACLE_DETECT_COMMAND
 import constants.CommConstants.STATUS_REQUEST
+import constants.CommConstants.UPDATE_REQUEST
 
 data class ParsedRequest(
 
@@ -43,7 +44,19 @@ data class ParsedRequest(
     val angle: String?="90",
 
     @SerializedName("filename")
-    val filename: String?="TestMap1"
+    val filename: String?="TestMap1",
+
+    @SerializedName(UPDATE_REQUEST)
+    val updateRequest: String?,
+
+    @SerializedName("value")
+    val value: Int?,
+
+    @SerializedName("id")
+    val id: String?,
+
+    @SerializedName("confidence")
+    val confidence: Double,
 
     ) {
     override fun equals(other: Any?): Boolean {

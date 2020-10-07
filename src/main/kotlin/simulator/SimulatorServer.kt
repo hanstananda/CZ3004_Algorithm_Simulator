@@ -162,28 +162,26 @@ object SimulatorServer {
         val response: String
         when {
             request.status != null -> {
-                when(request.status) {
+                when (request.status) {
                     MOVING_STATUS -> {
-                        val units:Int = request.delta!!.toInt()
-                        if (units<0) {
+                        val units: Int = request.delta!!.toInt()
+                        if (units < 0) {
                             for (unit in 1..-units) {
                                 robot.move(RobotConstants.MOVEMENT.BACKWARD)
                             }
-                        }
-                        else {
+                        } else {
                             for (unit in 1..units) {
                                 robot.move(RobotConstants.MOVEMENT.FORWARD)
                             }
                         }
                     }
                     ROTATING_STATUS -> {
-                        val delta:Int = request.delta!!.toInt()
-                        if(delta<0) {
-                            for (unit in 1..( (-delta) / 90)) {
+                        val delta: Int = request.delta!!.toInt()
+                        if (delta < 0) {
+                            for (unit in 1..((-delta) / 90)) {
                                 robot.move(RobotConstants.MOVEMENT.LEFT)
                             }
-                        }
-                        else {
+                        } else {
                             for (unit in 1..(delta / 90)) {
                                 robot.move(RobotConstants.MOVEMENT.RIGHT)
                             }
@@ -213,7 +211,7 @@ object SimulatorServer {
 //                debugMap(realTimeMap, robot)
             }
             request.exploredDetect != null -> {
-                for(pos in request.exploredDetect) {
+                for (pos in request.exploredDetect) {
                     val (xPos, yPos) = pos
                     logger.info { "Received explored info at ($xPos, $yPos) " }
                     if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
@@ -231,6 +229,12 @@ object SimulatorServer {
                 val logMsg = "Image $id detected at ($xPos, $yPos)!"
                 logger.info { logMsg }
                 Simulator.displayMessage(logMsg)
+                response = ""
+            }
+            request.updateRequest != null -> {
+                if (request.updateRequest == SENSOR_READ_COMMAND) {
+                    logger.info { "Sensor ${request.id} detected value of ${request.value}" }
+                }
                 response = ""
             }
             commandType == null -> {
@@ -293,7 +297,7 @@ object SimulatorServer {
                 response = Gson().toJson(UNKNOWN_COMMAND_ERROR)
             }
         }
-        if(response!="") {
+        if (response != "") {
             members[sender]?.send(Frame.Text(response))
         }
         updateSimulationUI()
@@ -349,6 +353,7 @@ object SimulatorServer {
         exploredMap = MazeMap()
         robot.resetRobot()
         robot.simulateSensors(exploredMap, trueMap)
+        logger.info{"Robot and map reset invoked successfully!"}
     }
 
     fun resetRealTimeMap() {
