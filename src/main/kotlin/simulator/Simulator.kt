@@ -211,7 +211,7 @@ object Simulator: ActionListener {
         val showMapBorder: TitledBorder = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(),"Display Map ")
         showMapBorder.titleJustification = TitledBorder.CENTER
         showMapPanel.border = showMapBorder
-        val types = arrayOf ("True Map", "Explored Map", "Real-Time Map")
+        val types = arrayOf ("True Map", "Explored Map", "Real-Time Map", "Persistent RT Map")
         val showMapButton = JComboBox<String>(types)
         showMapButton.isFocusable = false
         showMapButton.actionCommand = "Display Map"
@@ -499,12 +499,12 @@ object Simulator: ActionListener {
             updateSimulatorMap()
             displayMessage("Random map loaded.")
         }
-        if (action!!.contentEquals("Load Map")) {
+        if (action.contentEquals("Load Map")) {
             val arenaMap = e.source as JComboBox<*>
             val selectedFileString = arenaMap.selectedItem as String
             loadMap(selectedFileString)
         }
-        if (action!!.contentEquals("Display Map")) {
+        if (action.contentEquals("Display Map")) {
             val mapType = e.source as JComboBox<*>
             when (mapType.selectedItem as String){
                 "True Map" -> {
@@ -517,6 +517,10 @@ object Simulator: ActionListener {
                 }
                 "Real-Time Map" -> {
                     sim.map = SimulatorServer.realTimeMap
+                    updateSimulatorMap()
+                }
+                "Persistent RT Map" -> {
+                    sim.map = SimulatorServer.persistentRealTimeMap
                     updateSimulatorMap()
                 }
                 else -> {

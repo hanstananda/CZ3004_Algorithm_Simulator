@@ -46,6 +46,7 @@ object SimulatorServer {
     var trueMap = MazeMap()
     var exploredMap = MazeMap()
     var realTimeMap = MazeMap()
+    var persistentRealTimeMap = MazeMap()
     val robot = Robot(START_ROW, START_COL)
 
     init {
@@ -203,6 +204,7 @@ object SimulatorServer {
                 logger.info { "Received obstacle info at ($xPos, $yPos) " }
                 if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
                     realTimeMap.setObstacle(yPos, xPos, true)
+                    persistentRealTimeMap.setObstacle(yPos, xPos, true)
                 } else {
                     logger.warn { "received coordinate is invalid!" }
                 }
@@ -215,7 +217,11 @@ object SimulatorServer {
                     val (xPos, yPos) = pos
                     logger.info { "Received explored info at ($xPos, $yPos) " }
                     if (realTimeMap.checkValidCoordinates(yPos, xPos)) {
+                        // Set as explored, remove obstacle (considered as false detect)
+                        realTimeMap.setObstacle(yPos, xPos, false)
                         realTimeMap.grid[yPos][xPos].explored = true
+                        // Set only explored here, for logging and debug purposes
+                        persistentRealTimeMap.grid[yPos][xPos].explored = true
                     } else {
                         logger.warn { "received coordinate is invalid!" }
                     }
@@ -358,6 +364,7 @@ object SimulatorServer {
 
     fun resetRealTimeMap() {
         realTimeMap = MazeMap()
+        persistentRealTimeMap = MazeMap()
     }
 
 }
