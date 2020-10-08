@@ -10,7 +10,7 @@ object RobotConstants {
     const val MAX_SPEED = 7
     const val DEF_SPEED = 4
     const val SENSOR_SHORT_RANGE_L = 1 // lower range of short range sensor (cells)
-    const val SENSOR_SHORT_RANGE_H = 3 // upper range of short range sensor (cells)
+    const val SENSOR_SHORT_RANGE_H = 2 // upper range of short range sensor (cells)
     const val SENSOR_LONG_RANGE_L = 1 // lower range of long range sensor (cells)
     const val SENSOR_LONG_RANGE_H = 5 // upper range of long range sensor (cells)
     val START_DIR = DIRECTION.NORTH
