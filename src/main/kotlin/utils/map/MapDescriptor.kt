@@ -3,8 +3,11 @@ package utils.map
 import constants.RobotConstants
 import data.map.MazeMap
 import data.robot.Robot
+import mu.KotlinLogging
 import java.io.IOException
 import kotlin.math.abs
+
+val mapUtilsLogger = KotlinLogging.logger {}
 
 fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
     try {
@@ -24,7 +27,7 @@ fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
     }
 }
 
-fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {
+fun debugMap(mazeMap: MazeMap, robot: Robot? = null, usePrint: Boolean = false) {
     for (row in mazeMap.rowSize-1 downTo 0) {
         val builder = StringBuilder()
         for( col in 0 until mazeMap.colSize) {
@@ -63,7 +66,13 @@ fun debugMap(mazeMap: MazeMap, robot: Robot? = null) {
                 builder.append(".")
             }
         }
-        println(builder.toString())
+        if (usePrint) {
+            println(builder.toString())
+        }
+        else {
+            mapUtilsLogger.debug {builder.toString() }
+        }
+
     }
 }
 
