@@ -109,6 +109,7 @@ object SimulatorServer {
     }
 
     fun handleStartExploration(timeout: Int = -1, coverageLimit: Int = 100) {
+        Simulator.displayMessage("Starting exploration...")
         when {
             timeout != -1 -> {
                 GlobalScope.launch(Dispatchers.Default) {
@@ -124,7 +125,6 @@ object SimulatorServer {
                 }
             }
         }
-        Simulator.displayMessage("Exploration started.")
     }
 
     suspend fun startExplorationWithCoverage(coverageLimit: Int = 100) {
@@ -210,7 +210,7 @@ object SimulatorServer {
                 }
                 response = ""
 //                Simulator.sim.map = realTimeMap
-//                debugMap(realTimeMap, robot)
+                debugMap(realTimeMap, robot)
             }
             request.exploredDetect != null -> {
                 for (pos in request.exploredDetect) {
@@ -228,7 +228,7 @@ object SimulatorServer {
                 }
                 response = ""
 //                Simulator.sim.map = realTimeMap
-//                debugMap(realTimeMap, robot)
+                debugMap(realTimeMap, robot)
             }
             request.imageDetect != null -> {
                 val (id: Int, xPos: Int, yPos: Int) = request.imageDetect
