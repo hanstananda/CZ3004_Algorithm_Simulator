@@ -6,6 +6,7 @@ import java.io.Serializable
 object CommConstants {
 
     const val STATUS_REQUEST = "status"
+    const val REQUEST_COMMAND = "request"
     const val MOVING_STATUS = "moving"
     const val ROTATING_STATUS = "rotating"
     const val COMPLETED_STATUS = "completed"
@@ -24,6 +25,10 @@ object CommConstants {
     const val CALIBRATE_COMMAND = "calibrate"
     const val MAP_DETECT_1 = "map_detect_1"
     const val MAP_DETECT_2 = "map_detect_2"
+    const val WAYPOINT_COMMAND = "waypoint"
+    const val COVERAGE_LIMIT = "coverageLimit"
+    const val REASON = "reason"
+
 
     const val SENSOR_READ_COMMAND = "sensor_read"
 
@@ -33,11 +38,13 @@ object CommConstants {
     val FINISHED_COMMAND = mapOf("status" to "Command executed!")
     val UNKNOWN_COMMAND_ERROR = mapOf("status" to "Unknown Command!")
     val UNSUPPORTED_COMMAND_ERROR = mapOf("status" to "Unsupported Command!")
-    data class StartExplorationCommand(val coverageLimit: Int = 100){
+    data class StartExplorationCommand(
+        @SerializedName(COVERAGE_LIMIT)
+        val coverageLimit: Int=100){
         val request: String = "start_explore"
     }
-    val EXPLORATION_STOP_COMMAND  = mapOf("request" to "stop_explore")
-    val FASTEST_PATH_START_COMMAND = mapOf("request" to "start_fastest_path")
+    const val EXPLORATION_STOP_COMMAND  = "stop_explore"
+    const val FASTEST_PATH_START_COMMAND = "start_fastest_path"
 
     const val UPDATE_REQUEST = "update"
 

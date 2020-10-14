@@ -1,5 +1,6 @@
 package simulator
 
+import data.simulator.CommandRequest
 import com.google.gson.Gson
 import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
@@ -25,7 +26,9 @@ import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
+import data.simulator.FastestPathRequest
 import data.simulator.ParsedRequest
+import data.simulator.StopExplorationRequest
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
@@ -134,18 +137,20 @@ object SimulatorServer {
     }
 
     suspend fun stopExploration(reason: String = "force-stop") {
-        val commandMap = HashMap(EXPLORATION_STOP_COMMAND) // copy the basic command
-        commandMap["reason"] = reason
-        val command = Gson().toJson(commandMap)
+        val stopExplorationCommandObject = StopExplorationRequest(
+            reason = reason
+        )
+        val command = Gson().toJson(stopExplorationCommandObject)
         members[latestMember]?.send(Frame.Text(command))
         logger.info { "Sent stop exploration with reason $reason" }
         Simulator.displayMessage("Exploration stopped.")
     }
 
     suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
-        val commandMap = HashMap(FASTEST_PATH_START_COMMAND) // copy the basic command
-        commandMap["waypoint"] = "[$x,$y]"
-        val command = Gson().toJson(commandMap)
+        val fastestPathCommandObject = FastestPathRequest(
+            waypoint = arrayOf(x,y)
+        )
+        val command = Gson().toJson(fastestPathCommandObject)
         members[latestMember]?.send(Frame.Text(command))
     }
 
