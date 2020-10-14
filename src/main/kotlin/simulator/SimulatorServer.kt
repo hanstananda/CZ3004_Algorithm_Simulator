@@ -1,6 +1,5 @@
 package simulator
 
-import data.simulator.CommandRequest
 import com.google.gson.Gson
 import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
@@ -26,9 +25,7 @@ import constants.RobotConstants.START_COL
 import constants.RobotConstants.START_ROW
 import data.map.MazeMap
 import data.robot.Robot
-import data.simulator.FastestPathRequest
-import data.simulator.ParsedRequest
-import data.simulator.StopExplorationRequest
+import data.simulator.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
@@ -131,7 +128,7 @@ object SimulatorServer {
     }
 
     suspend fun startExplorationWithCoverage(coverageLimit: Int = 100) {
-        val startExplorationCommandObject = CommConstants.StartExplorationCommand(coverageLimit)
+        val startExplorationCommandObject = StartExplorationRequest(coverageLimit)
         val command = Gson().toJson(startExplorationCommandObject)
         members[latestMember]?.send(Frame.Text(command))
     }
@@ -147,8 +144,16 @@ object SimulatorServer {
     }
 
     suspend fun startFastestPathWithWaypoint(x: Int = START_COL, y: Int = START_ROW) {
+        val wayPoint:Pair<Int, Int> = when {
+            !trueMap.checkValidCoordinates(row=y, col=x) -> {
+                Pair(START_COL, START_ROW)
+            }
+            else -> {
+                Pair(x, y)
+            }
+        }
         val fastestPathCommandObject = FastestPathRequest(
-            waypoint = arrayOf(x,y)
+            waypoint = arrayOf(wayPoint.first,wayPoint.second)
         )
         val command = Gson().toJson(fastestPathCommandObject)
         members[latestMember]?.send(Frame.Text(command))
@@ -160,8 +165,14 @@ object SimulatorServer {
     }
 
     suspend fun message(sender: String, message: String) {
-        val request =
+        val request: ParsedRequest? =
             Gson().fromJson(message, ParsedRequest::class.java)
+
+        // If it is an invalid json
+        if (request == null) {
+            logger.warn { "Invalid json received! Received message is $message" }
+            return
+        }
 
         // Pre-format the message to be send, to prevent doing it for all the users or connected sockets.
         val commandType: String? = request.command

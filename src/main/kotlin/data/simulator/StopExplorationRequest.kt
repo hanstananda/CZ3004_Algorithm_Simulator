@@ -6,7 +6,7 @@ import constants.CommConstants.EXPLORATION_STOP_COMMAND
 
 data class StopExplorationRequest(
     @SerializedName(CommConstants.REASON)
-    val reason: String?
+    val reason: String? = null
 ) {
     @SerializedName(CommConstants.REQUEST_COMMAND)
     val request: String = EXPLORATION_STOP_COMMAND
