@@ -15,13 +15,29 @@ data class MazeMap(val rowSize: Int = MapConstants.DEFAULT_ROW_SIZE, val colSize
     private val yMove = intArrayOf(-1,0,1)
 
     init {
-        resetAllObstacle()
-        initExploredAreas()
+        reset()
     }
 
     fun reset() {
         resetAllObstacle()
         initExploredAreas()
+        resetPhantomBlockInitialValues()
+    }
+
+    private fun resetPhantomBlockInitialValues() {
+        for (row in 0 until rowSize) {
+            for (col in 0 until colSize) {
+                grid[row][col].phantomBlockInitial = 0
+            }
+        }
+    }
+
+    fun resetPhantomBlocksCount() {
+        for (row in 0 until rowSize) {
+            for (col in 0 until colSize) {
+                grid[row][col].phantomBlock = grid[row][col].phantomBlockInitial
+            }
+        }
     }
 
     private fun resetAllObstacle() {

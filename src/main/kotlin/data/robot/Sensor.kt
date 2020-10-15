@@ -64,6 +64,17 @@ data class Sensor(
             }
             exploredMap.grid[rPos][cPos].explored = true
 
+            // Careful! This implementation not 100% tested yet!
+            if(realMap.grid[rPos][cPos].phantomBlock >0) {
+                exploredMap.setObstacle(rPos, cPos, true)
+                realMap.grid[rPos][cPos].phantomBlock-=1
+                lastReading = i
+                break
+            }
+            else {
+                exploredMap.setObstacle(rPos, cPos, false)
+            }
+
             if (realMap.grid[rPos][cPos].obstacle) {
                 exploredMap.setObstacle(rPos, cPos, true)
                 lastReading = i
