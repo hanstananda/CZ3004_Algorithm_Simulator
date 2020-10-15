@@ -33,6 +33,7 @@ class SimulatorMap(var map: MazeMap, val bot: Robot) : JPanel() {
                         map.inStartZone(mapRow, mapCol) -> GraphicsConstants.START_CELL
                         map.inGoalZone(mapRow, mapCol) -> GraphicsConstants.GOAL_CELL
                         map.grid[mapRow][mapCol].obstacle -> GraphicsConstants.OBSTACLE_CELL
+                        map.grid[mapRow][mapCol].phantomBlock > 0 -> GraphicsConstants.PHANTOM_BLOCK_CELL
                         !map.grid[mapRow][mapCol].explored -> GraphicsConstants.UNEXPLORED_CELL
                         map.grid[mapRow][mapCol].path -> GraphicsConstants.FASTEST_PATH_CELL
                         else -> GraphicsConstants.FREE_CELL

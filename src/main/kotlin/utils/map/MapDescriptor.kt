@@ -18,6 +18,9 @@ fun loadMapFromDisk(mazeMap: MazeMap ,fileName: String) {
                     if(line[col] == '1') {
                         mazeMap.setObstacle(mazeMap.rowSize-1-row, col, true)
                     }
+                    if(line[col] in 'A'..'Z') {
+                        mazeMap.grid[mazeMap.rowSize-1-row][col].phantomBlockInitial = line[col].toInt() - 'A'.toInt() + 1
+                    }
                 }
             }
             mazeMap.initExploredAreas()

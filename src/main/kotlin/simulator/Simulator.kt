@@ -475,7 +475,7 @@ object Simulator: ActionListener {
             loadMapFromDisk(newMap,selectedFileString)
             newMap.setAllExplored()
             SimulatorServer.trueMap = newMap
-            SimulatorServer.resetExploredMapAndRobot()
+            SimulatorServer.resetMapAndRobot()
             sim.map= SimulatorServer.trueMap
             updateSimulatorMap()
             displayMessage("$selectedFileString loaded.")
@@ -494,7 +494,7 @@ object Simulator: ActionListener {
             var randomMap = RandomMapGenerator.createValidatedRandomMazeMap()
             randomMap.setAllExplored()
             SimulatorServer.trueMap = randomMap
-            SimulatorServer.resetExploredMapAndRobot()
+            SimulatorServer.resetMapAndRobot()
             sim.map= SimulatorServer.trueMap
             updateSimulatorMap()
             displayMessage("Random map loaded.")
@@ -546,7 +546,7 @@ object Simulator: ActionListener {
             }
         }
         if (action.contentEquals("Reset Robot")){
-            SimulatorServer.resetExploredMapAndRobot()
+            SimulatorServer.resetMapAndRobot()
             sim.map = SimulatorServer.trueMap
             updateSimulatorMap()
         }

@@ -11,6 +11,7 @@ object GraphicsConstants {
     val OBSTACLE_CELL: Color = Color.decode("#664147")
     val FASTEST_PATH_CELL: Color = Color.decode("#CB793A")
     val ROBOT_CELL: Color = Color.decode("#9B5DE5")
+    val PHANTOM_BLOCK_CELL: Color = Color.decode("#808080")
     val ROBOT_DIR_CELL: Color = Color.WHITE
     const val ROBOT_W = 70
     const val ROBOT_H = 70
