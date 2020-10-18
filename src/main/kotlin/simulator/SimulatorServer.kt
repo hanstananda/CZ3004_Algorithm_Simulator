@@ -1,11 +1,9 @@
 package simulator
 
 import com.google.gson.Gson
-import constants.CommConstants
 import constants.CommConstants.BACKWARD_COMMAND
 import constants.CommConstants.CALIBRATE_COMMAND
 import constants.CommConstants.COMPLETED_STATUS
-import constants.CommConstants.FASTEST_PATH_START_COMMAND
 import constants.CommConstants.FINISHED_COMMAND
 import constants.CommConstants.FORWARD_COMMAND
 import constants.CommConstants.LEFT_COMMAND
@@ -15,7 +13,6 @@ import constants.CommConstants.RIGHT_COMMAND
 import constants.CommConstants.ROTATE_COMMAND
 import constants.CommConstants.SENSOR_READ_COMMAND
 import constants.CommConstants.COMPLETED_STATUS_MAP
-import constants.CommConstants.EXPLORATION_STOP_COMMAND
 import constants.CommConstants.MOVING_STATUS
 import constants.CommConstants.ROTATING_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
@@ -33,7 +30,6 @@ import mu.KotlinLogging
 import utils.map.RandomMapGenerator
 import utils.map.debugMap
 import utils.map.loadMapFromDisk
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
@@ -364,15 +360,16 @@ object SimulatorServer {
     }
 
     fun resetToInitialServerState() {
-        resetExploredMapAndRobot()
+        resetMapAndRobot()
         loadMapFromDisk(trueMap, DEFAULT_MAP)
         trueMap.setAllExplored()
         updateSimulationUI()
     }
 
-    fun resetExploredMapAndRobot() {
+    fun resetMapAndRobot() {
         resetRealTimeMap()
         exploredMap = MazeMap()
+        trueMap.resetPhantomBlocksCount()
         robot.resetRobot()
         robot.simulateSensors(exploredMap, trueMap)
         logger.info{"Robot and map reset invoked successfully!"}

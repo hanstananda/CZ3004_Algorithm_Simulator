@@ -13,6 +13,8 @@ data class Cell(val row: Int, val col: Int) {
     var waypoint: Boolean = false
     var startpoint: Boolean = false
     var endpoint: Boolean = false
+    var phantomBlockInitial:Int = 0
+    var phantomBlock: Int = 0
     var path: Boolean = false
 
 }
