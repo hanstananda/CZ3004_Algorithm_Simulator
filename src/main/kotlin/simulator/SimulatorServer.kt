@@ -16,6 +16,7 @@ import constants.CommConstants.COMPLETED_STATUS_MAP
 import constants.CommConstants.MOVING_STATUS
 import constants.CommConstants.ROTATING_STATUS
 import constants.CommConstants.UNKNOWN_COMMAND_ERROR
+import constants.CommConstants.TAKE_IMAGE_COMMAND
 import constants.MapConstants.DEFAULT_MAP
 import constants.RobotConstants
 import constants.RobotConstants.START_COL
@@ -44,6 +45,7 @@ object SimulatorServer {
     var realTimeMap = MazeMap()
     var persistentRealTimeMap = MazeMap()
     val robot = Robot(START_ROW, START_COL)
+    var imageCounter = 0
 
     init {
         Simulator.sim = SimulatorMap(trueMap, robot)
@@ -252,6 +254,15 @@ object SimulatorServer {
             request.updateRequest != null -> {
                 if (request.updateRequest == SENSOR_READ_COMMAND) {
                     logger.info { "Sensor ${request.id} detected value of ${request.value}" }
+                }
+                else if (request.updateRequest == TAKE_IMAGE_COMMAND) {
+                    logger.info {"Take image request received! "}
+                    if(imageCounter%2==0 && imageCounter<=30) {
+                        response = imageCounter/2.toString()
+                    }
+                    else {
+
+                    }
                 }
                 response = ""
             }

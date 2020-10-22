@@ -19,6 +19,7 @@ object CommConstants {
     const val MOVEMENT_COMMAND = "move"
     const val ROTATE_COMMAND = "rotate"
     const val IMAGE_COMMAND = "image_detect"
+    const val TAKE_IMAGE_COMMAND = "take_image"
     const val OBSTACLE_DETECT_COMMAND = "obstacle_detect"
     const val EXPLORED_DETECT_COMMAND = "explored_detect"
     const val LOAD_TEST_MAP_COMMAND = "load_test_map"
@@ -43,5 +44,6 @@ object CommConstants {
     const val FASTEST_PATH_START_COMMAND = "start_fastest_path"
 
     const val UPDATE_REQUEST = "update"
+    const val IMAGE_ID = "image_id"
 
 }
